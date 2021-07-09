@@ -1,70 +1,47 @@
-# Getting Started with Create React App
+# Serverless Guest Wi-Fi
+Serverless Guest Wi-Fi is an application that provides secure (802.1X) guest Wi-Fi and modernizes the onboarding process from checking in at reception to connecting to Wi-Fi.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+- [Description](#Description)
+- [Deploying](#deploying)
+- [Demo](#demo)
 
-## Available Scripts
+## Description
+Guest Wi-Fi has not changed much in the past and this application demonstrates guest Wi-Fi using 802.1X for the SSID's authentication method. The application leverages AWS serverless to keep operational work to a minimum and in addition, the SSID uses Meraki Authentication which eliminates the need of a RADIUS server.
 
-In the project directory, you can run:
+The application leverages the custom of guests checking in at the reception. The guest will fill the form with their information (first name, last name, email, and organization) and the host's email who is visiting. Upon successfully submitting the form, a Webex bot will message the host that the guest has arrived, and the message will include two buttons to accept or decline access to guest Wi-Fi. If the host clicks the button accept, the application will provision Meraki Authentication accounts, and the Meraki Dashboard will send passwords for each account via email. If the host clicks the button decline, the application will not create these accounts. Below is a simplified sequence diagram.
 
-### `yarn start`
+<p align="center">
+  <img src="https://yujiterada.s3.us-west-2.amazonaws.com/serverless-guest-wifi/sequence_diagram.jpeg" width="600">
+</p>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Deploying
+Will be updated after moving some code in Lambda function to layers for minimum configuration.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Demo
+This app has a demo environment. Read the requirements and steps below to use it.
+### Requirements
+This demo requires a physical MR. Also, some email input in the form requires a Webex account. The following is the list of requirements.
+- Meraki Access Point (MR)
+- Webex account for email inserted in [management](https://guestwifi.apicli.com/management)
+- Webex account for email inserted as host in [checkin](https://guestwifi.apicli.com/checkin)
 
-### `yarn test`
+### Steps
+1. Add MR from [management](https://guestwifi.apicli.com/management)
+2. The guest will fill the form with his/her details and host's email at [checkin](https://guestwifi.apicli.com/checkin)
+3. The host will click the accept button in the Webex message received
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+<p align="center">
+  <img src="https://yujiterada.s3.us-west-2.amazonaws.com/serverless-guest-wifi/webex_message.png" width="400">
+</p>
 
-### `yarn build`
+4. The guest will receive email with crendentials via email
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+<p align="center">
+  <img src="https://yujiterada.s3.us-west-2.amazonaws.com/serverless-guest-wifi/email.png" width="400">
+</p>
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+5. The guest will connect to SSID with name "Guest WiFi dot1x"
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+<p align="center">
+  <img src="https://yujiterada.s3.us-west-2.amazonaws.com/serverless-guest-wifi/ssid.png" width="400">
+</p>
