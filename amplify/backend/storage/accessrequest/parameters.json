@@ -1,0 +1,5 @@
+{
+    "tableName": "accessrequest",
+    "partitionKeyName": "id",
+    "partitionKeyType": "S"
+}

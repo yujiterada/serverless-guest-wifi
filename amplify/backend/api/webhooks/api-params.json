@@ -1,0 +1,35 @@
+{
+  "paths": [
+    {
+      "name": "/webhooks",
+      "lambdaFunction": "webhooks",
+      "privacy": {
+        "open": true
+      },
+      "policyResourceName": "/webhooks"
+    }
+  ],
+  "resourceName": "webhooks",
+  "apiName": "webhooks",
+  "functionArns": [
+    {
+      "lambdaFunction": "webhooks"
+    }
+  ],
+  "privacy": {
+    "auth": 0,
+    "unauth": 0,
+    "authRoleName": "amplify-serverlessguestwifi-dev-111518-authRole",
+    "unAuthRoleName": "amplify-serverlessguestwifi-dev-111518-unauthRole"
+  },
+  "dependsOn": [
+    {
+      "category": "function",
+      "resourceName": "webhooks",
+      "attributes": [
+        "Name",
+        "Arn"
+      ]
+    }
+  ]
+}

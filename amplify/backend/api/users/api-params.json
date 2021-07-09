@@ -1,0 +1,35 @@
+{
+  "paths": [
+    {
+      "name": "/users",
+      "lambdaFunction": "users",
+      "privacy": {
+        "open": true
+      },
+      "policyResourceName": "/users"
+    }
+  ],
+  "resourceName": "users",
+  "apiName": "users",
+  "functionArns": [
+    {
+      "lambdaFunction": "users"
+    }
+  ],
+  "privacy": {
+    "auth": 0,
+    "unauth": 0,
+    "authRoleName": "amplify-serverlessguestwifi-dev-111518-authRole",
+    "unAuthRoleName": "amplify-serverlessguestwifi-dev-111518-unauthRole"
+  },
+  "dependsOn": [
+    {
+      "category": "function",
+      "resourceName": "users",
+      "attributes": [
+        "Name",
+        "Arn"
+      ]
+    }
+  ]
+}

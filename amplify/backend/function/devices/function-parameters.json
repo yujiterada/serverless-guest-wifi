@@ -1,0 +1,38 @@
+{
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "webexBaseUrl",
+      "environmentVariableName": "WEBEX_BASE_URL"
+    },
+    {
+      "cloudFormationParameterName": "merakiBaseUrl",
+      "environmentVariableName": "MERAKI_BASE_URL"
+    },
+    {
+      "cloudFormationParameterName": "merakiNetworkId",
+      "environmentVariableName": "MERAKI_NETWORK_ID"
+    },
+    {
+      "cloudFormationParameterName": "merakiOrganizationId",
+      "environmentVariableName": "MERAKI_ORGANIZATION_ID"
+    }
+  ],
+  "secretNames": [
+    "WEBEX_ACCESS_TOKEN",
+    "MERAKI_API_KEY"
+  ],
+  "permissions": {
+    "storage": {
+      "device": [
+        "create",
+        "read",
+        "delete"
+      ],
+      "user": [
+        "create",
+        "read"
+      ]
+    }
+  }
+}

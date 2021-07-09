@@ -1,0 +1,29 @@
+{
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "webexBaseUrl",
+      "environmentVariableName": "WEBEX_BASE_URL"
+    }
+  ],
+  "secretNames": [
+    "WEBEX_ACCESS_TOKEN"
+  ],
+  "permissions": {
+    "storage": {
+      "accessrequest": [
+        "create",
+        "read"
+      ],
+      "user": [
+        "create",
+        "read"
+      ]
+    },
+    "api": {
+      "webhooks": [
+        "read"
+      ]
+    }
+  }
+}

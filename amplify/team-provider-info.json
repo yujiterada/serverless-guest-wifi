@@ -1,0 +1,82 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-serverlessguestwifi-dev-111518-authRole",
+      "UnauthRoleArn": "arn:aws:iam::107524997680:role/amplify-serverlessguestwifi-dev-111518-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::107524997680:role/amplify-serverlessguestwifi-dev-111518-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
+      "UnauthRoleName": "amplify-serverlessguestwifi-dev-111518-unauthRole",
+      "StackName": "amplify-serverlessguestwifi-dev-111518",
+      "StackId": "arn:aws:cloudformation:us-west-2:107524997680:stack/amplify-serverlessguestwifi-dev-111518/231b9650-e053-11eb-9122-06b6e9e70973",
+      "AmplifyAppId": "d13k4u9m76sloy"
+    },
+    "categories": {
+      "function": {
+        "devices": {
+          "webexBaseUrl": "https://webexapis.com/v1",
+          "merakiBaseUrl": "https://api.meraki.com/api/v1",
+          "merakiNetworkId": "N_698057942242493521",
+          "merakiOrganizationId": "698057942242430650",
+          "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
+          "s3Key": "amplify-builds/devices-6e763748517358724443-build.zip"
+        },
+        "users": {
+          "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
+          "s3Key": "amplify-builds/users-636f4e2f536e47657379-build.zip",
+          "webexBaseUrl": "https://webexapis.com/v1"
+        },
+        "webhooks": {
+          "merakiBaseUrl": "https://api.meraki.com/api/v1",
+          "merakiNetworkId": "N_698057942242493521",
+          "webexBaseUrl": "https://webexapis.com/v1",
+          "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
+          "s3Key": "amplify-builds/webhooks-444850432f7865366e6b-build.zip"
+        }
+      }
+    }
+  },
+  "prod": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-serverlessguestwifi-prod-145804-authRole",
+      "UnauthRoleArn": "arn:aws:iam::107524997680:role/amplify-serverlessguestwifi-prod-145804-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::107524997680:role/amplify-serverlessguestwifi-prod-145804-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-serverlessguestwifi-prod-145804-deployment",
+      "UnauthRoleName": "amplify-serverlessguestwifi-prod-145804-unauthRole",
+      "StackName": "amplify-serverlessguestwifi-prod-145804",
+      "StackId": "arn:aws:cloudformation:us-west-2:107524997680:stack/amplify-serverlessguestwifi-prod-145804/40f89aa0-e072-11eb-b323-021edf13797d",
+      "AmplifyAppId": "d13k4u9m76sloy"
+    },
+    "categories": {
+      "function": {
+        "devices": {
+          "webexBaseUrl": "https://webexapis.com/v1",
+          "merakiBaseUrl": "https://api.meraki.com/api/v1",
+          "merakiNetworkId": "N_698057942242493521",
+          "merakiOrganizationId": "698057942242430650",
+          "deploymentBucketName": "amplify-serverlessguestwifi-prod-145804-deployment",
+          "s3Key": "amplify-builds/devices-6e763748517358724443-build.zip"
+        },
+        "users": {
+          "deploymentBucketName": "amplify-serverlessguestwifi-prod-145804-deployment",
+          "s3Key": "amplify-builds/users-636f4e2f536e47657379-build.zip",
+          "webexBaseUrl": "https://webexapis.com/v1"
+        },
+        "webhooks": {
+          "merakiBaseUrl": "https://api.meraki.com/api/v1",
+          "merakiNetworkId": "N_698057942242493521",
+          "webexBaseUrl": "https://webexapis.com/v1",
+          "deploymentBucketName": "amplify-serverlessguestwifi-prod-145804-deployment",
+          "s3Key": "amplify-builds/webhooks-6767733572664f313776-build.zip"
+        }
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d13k4u9m76sloy",
+          "type": "manual"
+        }
+      }
+    }
+  }
+}

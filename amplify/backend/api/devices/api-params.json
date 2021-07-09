@@ -1,0 +1,35 @@
+{
+  "paths": [
+    {
+      "name": "/devices",
+      "lambdaFunction": "devices",
+      "privacy": {
+        "open": true
+      },
+      "policyResourceName": "/devices"
+    }
+  ],
+  "resourceName": "devices",
+  "apiName": "devices",
+  "functionArns": [
+    {
+      "lambdaFunction": "devices"
+    }
+  ],
+  "privacy": {
+    "auth": 0,
+    "unauth": 0,
+    "authRoleName": "amplify-serverlessguestwifi-dev-111518-authRole",
+    "unAuthRoleName": "amplify-serverlessguestwifi-dev-111518-unauthRole"
+  },
+  "dependsOn": [
+    {
+      "category": "function",
+      "resourceName": "devices",
+      "attributes": [
+        "Name",
+        "Arn"
+      ]
+    }
+  ]
+}
