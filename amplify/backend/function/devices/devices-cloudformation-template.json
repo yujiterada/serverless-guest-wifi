@@ -170,11 +170,11 @@
             "MERAKI_BASE_URL": {
               "Ref": "merakiBaseUrl"
             },
-            "MERAKI_ORGANIZATION_ID": {
-              "Ref": "merakiOrganizationId"
-            },
             "MERAKI_NETWORK_ID": {
               "Ref": "merakiNetworkId"
+            },
+            "MERAKI_ORGANIZATION_ID": {
+              "Ref": "merakiOrganizationId"
             }
           }
         },
