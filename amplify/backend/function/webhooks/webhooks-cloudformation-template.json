@@ -164,11 +164,11 @@
             "MERAKI_BASE_URL": {
               "Ref": "merakiBaseUrl"
             },
-            "MERAKI_NETWORK_ID": {
-              "Ref": "merakiNetworkId"
-            },
             "WEBEX_BASE_URL": {
               "Ref": "webexBaseUrl"
+            },
+            "MERAKI_NETWORK_ID": {
+              "Ref": "merakiNetworkId"
             }
           }
         },

@@ -10,12 +10,12 @@
       "environmentVariableName": "MERAKI_BASE_URL"
     },
     {
-      "cloudFormationParameterName": "merakiNetworkId",
-      "environmentVariableName": "MERAKI_NETWORK_ID"
-    },
-    {
       "cloudFormationParameterName": "merakiOrganizationId",
       "environmentVariableName": "MERAKI_ORGANIZATION_ID"
+    },
+    {
+      "cloudFormationParameterName": "merakiNetworkId",
+      "environmentVariableName": "MERAKI_NETWORK_ID"
     }
   ],
   "secretNames": [
