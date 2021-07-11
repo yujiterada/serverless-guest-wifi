@@ -82,6 +82,11 @@
           ]
         }
       ]
+    },
+    "serverlessguestwifimeraki": {
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer",
+      "build": true
     }
   },
   "storage": {
