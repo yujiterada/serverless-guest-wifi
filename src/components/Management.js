@@ -114,45 +114,16 @@ class Management extends Component {
             }
           }))
         } catch(error) {
-          if (error.response.status === 404) {
-            const errors = error.response.data
-            console.log(errors)
-            this.setState((previousState) => ({
-              ...previousState,
-              result: 'failure',
-              error: {
-                title: 'The serial could not be found. If you have just removed the serial from its previous organization, try again in 30 minutes.',
-                'invalid-params': [
-                  {
-                    param: 'serial',
-                    msg: 'Invalid serial number.' 
-                  }
-                ]
-              }
-            }))
-          }
-          else if (error.response.status >= 500 && error.response.status <= 599) {
-            this.setState((previousState) => ({
-              ...previousState,
-              result: 'failure',
-              error: {
-                title: 'An internal server error occurred. Please contact the administrator.',
-                'invalid-params': []
-              }
-            }))
-          }
-          else {
-            const errors = error.response.data
-            console.log(errors)
-            this.setState((previousState) => ({
-              ...previousState,
-              result: 'failure',
-              error: {
-                title: errors.title,
-                'invalid-params': errors['invalid-params']
-              }
-            }))
-          }
+          const errors = error.response.data
+          console.log(errors)
+          this.setState((previousState) => ({
+            ...previousState,
+            result: 'failure',
+            error: {
+              title: errors.title,
+              'invalid-params': errors['invalid-params']
+            }
+          }))
         }
         break;
       case 'remove':
