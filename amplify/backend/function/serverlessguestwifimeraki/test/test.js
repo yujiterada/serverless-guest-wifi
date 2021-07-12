@@ -47,6 +47,20 @@ describe('Meraki.js tests', () => {
         assert.strictEqual(error.message, "Invalid URL")
       }
     }).timeout(10000)
+    // Claim valid serial into org
+    it(`should return "{ orders: [], serials: [ '${serial}' ], licenses: [] }"`, async () => {
+      const response = await meraki.claimIntoOrganization(merakiOrganizationId, [serial])
+      assert.deepStrictEqual(response, { orders: [], serials: [ serial ], licenses: [] })
+    }).timeout(10000)
+    // Claim invalid serial into org
+    it(`should return error.status=400, error.message="Device with serial '${serial}' not found"`, async () => {
+      try {
+        const response = await meraki.claimIntoOrganization(merakiOrganizationId, [invalidSerial])
+      } catch(error) {
+        assert.strictEqual(error.status, 400)
+        assert.strictEqual(error.message, `Device with serial '${invalidSerial}' not found`)
+      }
+    }).timeout(10000)
     // Claim valid serial
     it('should return {}', async () => {
       const response = await meraki.claimNetworkDevices(merakiNetworkId, [serial])
@@ -66,10 +80,11 @@ describe('Meraki.js tests', () => {
       }
     }).timeout(10000)
     // Claim invalid serial
-    it(`should return "Device with serial ${invalidSerial} not found"`, async () => {
+    it(`should return error.status=400, error.message="Device with serial ${invalidSerial} not found"`, async () => {
       try {
         const response = await meraki.claimNetworkDevices(merakiNetworkId, [invalidSerial])
       } catch(error) {
+        assert.strictEqual(error.status, 400)
         assert.strictEqual(error.message, `Device with serial ${invalidSerial} not found`)
       }
     }).timeout(10000)
