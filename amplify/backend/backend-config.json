@@ -6,6 +6,13 @@
       "service": "Lambda",
       "dependsOn": [
         {
+          "category": "function",
+          "resourceName": "serverlessguestwifimeraki",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
           "category": "storage",
           "resourceName": "device",
           "attributes": [

@@ -2,13 +2,12 @@ const AWS = require('aws-sdk')
 const docClient = new AWS.DynamoDB.DocumentClient()
 
 const fetch = require('node-fetch')
-
-const Meraki = require('./Meraki')
+const { Meraki } = require('/opt/nodejs/Meraki')
 const { Errors, RESTError } = require('./Errors')
 
 
 class Device {
-  constructor(serial, email='', merakiApiKey) {
+  constructor(merakiApiKey, serial, email='', ) {
     this.serial = serial
     this.email = email
     this.existsInDynamoDB = false
@@ -17,6 +16,7 @@ class Device {
     this.emailMatches = false
     this.hasDataConflict = false
     this.merakiApiKey = merakiApiKey
+    this.meraki = new Meraki(this.merakiApiKey, process.env.MERAKI_BASE_URL)
   }
 
   async init() {
@@ -37,10 +37,11 @@ class Device {
         console.warn(err)
         throw new RESTError(Errors.InternalServerError)
       }
+    } finally {
+      console.log(`[Device][init()] Check device with serial=${this.serial} for data conflict in DynamoDB and Meraki Dashboard`)
+      this.checkDataConflict()
     }
     console.log(`[Device][init()] Found device with serial=${this.serial} in DynamoDB and Meraki Dashboard`)
-    console.log(`[Device][init()] Check device with serial=${this.serial} for data conflict in DynamoDB and Meraki Dashboard`)
-    this.checkDataConflict()
   }
 
   checkDataConflict() {
@@ -102,44 +103,35 @@ class Device {
 
   async queryMerakiDashboard() {
     console.log(`[Device][queryMerakiDashboard()] Querying device with serial=${this.serial} in Meraki Dashboard`)
-    const meraki = new Meraki(this.merakiApiKey, process.env.MERAKI_BASE_URL)
     try {
-      const response = await meraki.getOrganizationInventoryDevice(process.env.MERAKI_ORGANIZATION_ID, this.serial)
-      // If 200, then the serial does exist in the organization's inventory
-      if (response.status === 200) {
-        console.log(`[Device][queryMerakiDashboard()] Found device with serial=${this.serial} in Meraki Dashboard`)
+      const data = await this.meraki.getOrganizationInventoryDevice(process.env.MERAKI_ORGANIZATION_ID, this.serial)
+      // If networkId is not null, then the serial exists in the network
+      if (data.networkId) {
+        console.log(`[Device][queryMerakiDashboard()] Found device with serial=${this.serial} in Meraki Network`)
+        this.existsInMerakiNetwork = true
         this.existsInMerakiInventory = true
-        const data = await response.json()
-        // If networkId is not null, then the serial exists in the network
-        if (data.networkId) {
-          console.log(`[Device][queryMerakiDashboard()] Found device with serial=${this.serial} in Meraki Network`)
-          this.existsInMerakiNetwork = true
-        }
-        else {
-          console.log(`[Device][queryMerakiDashboard()] Device not found with serial=${this.serial} in Meraki Network`)
-        }
       }
-      // Else if 404, then the serial does not exist in the organization/network
+      // If networkId is null, then the serial exists in inventory
+      else {
+        console.log(`[Device][queryMerakiDashboard()] Device not found with serial=${this.serial} in Meraki Network`)
+        this.existsInMerakiInventory = true
+      }
+      this.checkDataConflict()
+    } catch(error) {
+      console.warn(`[Device][queryMerakiDashboard()] Failed to find device with serial=${this.serial} in Meraki Dashboard`)
+      console.warn(error)
+      // If 404, then the serial does not exist in the organization/network
       // It could also be an invalid serial so throw an error
-      else if (response.status === 404) {
-        console.log(`[Device][queryMerakiDashboard()] Device not found with serial=${this.serial} in Meraki Dashboard`)
-        this.existsInMerakiInventory = false
-        this.existsInMerakiNetwork = false
-      }
-      else {
-        const data = await response.json()
-        throw new Error(data.errors)
-      }
-    } catch(err) {
-      console.warn(`[Device][queryMerakiDashboard()] Failed to get device with serial=${this.serial} in Meraki Dashboard`)
-      this.error = true
-      // Throw error
-      if (err instanceof RESTError) {
-        throw err
-      }
-      else {
-        console.warn(err)
-        throw new RESTError(Errors.InternalServerError)
+      switch (error.status) {
+        case 404:
+          this.existsInMerakiInventory = false
+          this.existsInMerakiNetwork = false
+          // Don't throw error as this is normal
+          // For example, a user can try to add a device that doesn't exist in the Meraki Organization
+          break
+        default:
+          this.error = true
+          throw new RESTError(Errors.InternalServerError)
       }
     }
   }
@@ -168,88 +160,67 @@ class Device {
 
   async addToMerakiInventory() {
     console.log(`[Device][addToMerakiInventory()] Adding device with serial=${this.serial} in Meraki inventory`)
-    const meraki = new Meraki(this.merakiApiKey, process.env.MERAKI_BASE_URL)
     try {
-      const response = await meraki.claimIntoOrganization(process.env.MERAKI_ORGANIZATION_ID, [this.serial])
-      
-      if (response.status === 400) {
-        console.warn(`[Device][addToMerakiInventory()] Invalid device with serial=${this.serial}`)
-        this.existsInMerakiInventory = false
-        this.existsInMerakiNetwork = false
-        this.checkDataConflict()
-        const data = await response.json()
-        if (data.errors === `Device with serial ${req.body.serial} is already claimed`) {
-          throw new RESTError({
-            ...Errors.BadRequest, 
-            message: 'Serial is already claimed in a different Meraki Organization or if you have just unclaimed from an organization, please try again in 30 minutes.',
-            'invalid-params': [
-              {
-                param: 'serial',
-                msg: 'Invalid serial number'
-              }
-            ]
-          })
-        }
-        else {
-          throw new RESTError(Errors.BadRequest)
-        }
-      }
-      else if (response.status === 404) {
-        console.warn(`[Device][addToMerakiInventory()] Invalid device with serial=${this.serial}`)
-        this.existsInMerakiInventory = false
-        throw new RESTError(Errors.NotFound)
-      }
-      else if (response.status < 200 || response.status > 299) {
-        console.warn(`[Device][addToMerakiInventory()] Something went wrong when adding device with serial=${this.serial} in Meraki inventory`)
-        throw new RESTError(Errors.InternalServerError)
-      }
-      else {
-        console.log(`[Device][addToMerakiInventory()] Added device with serial=${this.serial} in Meraki inventory`)
-        this.existsInMerakiInventory = true
-      }
-    } catch (err) {
+      const response = await this.meraki.claimIntoOrganization(process.env.MERAKI_ORGANIZATION_ID, [this.serial])
+      this.existsInMerakiInventory = true
+      console.info(`[Device][addToMerakiInventory()] Success adding device with serial=${this.serial} in Meraki inventory`)
+    } catch(error) {
       console.warn(`[Device][addToMerakiInventory()] Failed to add device with serial=${this.serial} in Meraki inventory`)
-      // Throw error
-      if (err instanceof RESTError) {
-        throw err
+      console.warn(error)
+      this.existsInMerakiInventory = false
+      switch (error.status) {
+        case 400:
+          throw new RESTError({
+            ...Errors.BadRequest,
+            message: error.message
+          }, [{
+            param: 'serial',
+            msg: 'Invalid serial number'
+          }])
+        case 404:
+          throw new RESTError(Errors.NotFound)
+        default:
+          throw new RESTError(Errors.InternalServerError)
       }
-      else {
-        console.warn(err)
-        throw new RESTError(Errors.InternalServerError)
-      }
+    } finally {
+      this.checkDataConflict()
     }
   }
 
   async addToMerakiNetwork() {
     console.log(`[Device][addToMerakiNetwork()] Adding device with serial=${this.serial} in Meraki Network`)
-    const meraki = new Meraki(this.merakiApiKey, process.env.MERAKI_BASE_URL)
     try {
-      const response = await meraki.claimNetworkDevices(process.env.MERAKI_NETWORK_ID, [this.serial])
-      if (response.status === 404) {
-        console.warn(`[Device][addToMerakiNetwork()] Device not found with serial=${this.serial} in Meraki Network`)
-        this.existsInMerakiNetwork = false
-        this.checkDataConflict()
-        throw new RESTError(Errors.NotFound)
+      const response = await this.meraki.claimNetworkDevices(process.env.MERAKI_NETWORK_ID, [this.serial])
+      console.log(`[Device][addToMerakiNetwork()] Added device with serial=${this.serial} in Meraki Network`)
+      this.existsInMerakiNetwork = true
+    } catch(error) {
+      console.warn(`[Device][addToMerakiInventory()] Failed to add device with serial=${this.serial} in Meraki Network`)
+      console.warn(error)
+      this.existsInMerakiNetwork = false
+      switch (response.status) {
+        case 400:
+          if (error.message === `Device with serial ${req.body.serial} is already claimed`) {
+            throw new RESTError({
+              ...Errors.BadRequest, 
+              message: 'Serial is already claimed in a different Meraki Organization or if you have just unclaimed from an organization, please try again in 30 minutes.',
+              'invalid-params': [
+                {
+                  param: 'serial',
+                  msg: 'Invalid serial number'
+                }
+              ]
+            })
+          }
+          else {
+            throw new RESTError(Errors.BadRequest)
+          }
+        case 404:
+          throw new RESTError(Errors.NotFound)
+        default:
+          throw new RESTError(Errors.InternalServerError)
       }
-      else if (response.status < 200 || response.status > 299) {
-        console.warn(`[Device][addToMerakiNetwork()] Something went wrong when adding device with serial=${this.serial} in Meraki Network`)
-        throw new RESTError(Errors.InternalServerError)
-      }
-      else {
-        console.log(`[Device][addToMerakiNetwork()] Added device with serial=${this.serial} in Meraki Network`)
-        this.existsInMerakiNetwork = true
-        this.checkDataConflict()
-      }
-    } catch(err) {
-      console.warn(`[Device][addToMerakiNetwork()] Failed to add device with serial=${this.serial} in Meraki Network`)
-      // Throw error
-      if (err instanceof RESTError) {
-        throw err
-      }
-      else {
-        console.warn(err)
-        throw new RESTError(Errors.InternalServerError)
-      }
+    } finally {
+      this.checkDataConflict()
     }
   }
 
@@ -276,37 +247,24 @@ class Device {
 
   async removeFromMerakiNetwork() {
     console.log(`[Device][removeFromMerakiNetwork()] Removing device with serial=${this.serial} in Meraki Network`)
-    const meraki = new Meraki(this.merakiApiKey, process.env.MERAKI_BASE_URL)
     try {
-      const response = await meraki.removeNetworkDevices(process.env.MERAKI_NETWORK_ID, this.serial)
-      
-      if (response.status === 404) {
-        console.warn(`[Device][removeFromMerakiNetwork()] Device not found with serial=${this.serial} in Meraki Network`)
-        this.existsInMerakiInventory = false
-        this.existsInMerakiNetwork = false
-        this.checkDataConflict()
-        throw new RESTError(Errors.NotFound)
-      }
-      else if (response.status < 200 || response.status > 299) {
-        console.warn(`[Device][removeFromMerakiNetwork()] Something went wrong when removing device with serial=${this.serial} in Meraki Network`)
-        throw new RESTError(Errors.InternalServerError)
-      }
-      else {
-        console.log(`[Device][removeFromMerakiNetwork()] Removed device with serial=${this.serial} in Meraki Network`)
-        this.existsInMerakiInventory = false
-        this.existsInMerakiNetwork = false
-        this.checkDataConflict()
-      }
-    } catch (err) {
+      const response = await this.meraki.removeNetworkDevices(process.env.MERAKI_NETWORK_ID, this.serial)
+      console.log(`[Device][removeFromMerakiNetwork()] Removed device with serial=${this.serial} in Meraki Network`)
+      this.existsInMerakiInventory = false
+      this.existsInMerakiNetwork = false
+    } catch (error) {
       console.warn(`[Device][removeFromMerakiNetwork()] Failed to remove device with serial=${this.serial} in Meraki Network`)
-      // Throw error
-      if (err instanceof RESTError) {
-        throw err
+      console.warn(error)
+      switch(error.status) {
+        case 404:
+          this.existsInMerakiInventory = false
+          this.existsInMerakiNetwork = false
+          throw new RESTError(Errors.NotFound)
+        default:
+          throw new RESTError(Errors.InternalServerError)
       }
-      else {
-        console.warn(err)
-        throw new RESTError(Errors.InternalServerError)
-      }
+    } finally {
+      this.checkDataConflict()
     }
   }
 }

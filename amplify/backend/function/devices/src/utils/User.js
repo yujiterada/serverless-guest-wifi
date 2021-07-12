@@ -3,7 +3,7 @@ const docClient = new AWS.DynamoDB.DocumentClient()
 
 const { v4: uuidv4 } = require('uuid')
 
-const Meraki = require('./Meraki')
+const { Meraki } = require('/opt/nodejs/Meraki')
 const { Webex } = require('./Webex');
 const { Errors, RESTError } = require('./Errors');
 
@@ -128,7 +128,13 @@ class User {
     try {
       const response = await webex.sendText(this.email, text)
       if (response.status === 404) {
-        throw new RESTError({...Errors.NotFound, message: 'Webex Teams account is required for the email you have entered to use this service.'})
+        throw new RESTError({
+          ...Errors.NotFound,
+          message: 'You need a Webex Teams account for the email you have entered to use this service.'},
+          [{
+            param: 'email',
+            msg: 'Invalid email address'
+          }])
       }
     } catch(err) {
       console.warn(`[User][sendWebexText()] Failed to send text=${text} to user with email=${this.email}`)
@@ -168,7 +174,13 @@ class User {
     try {
       const response = await webex.sendText(this.email, message)
       if (response.status === 404) {
-        throw new RESTError({...Errors.NotFound, message: 'You need a Webex Teams account for the email you have entered to use this service.'})
+        throw new RESTError({
+          ...Errors.NotFound,
+          message: 'You need a Webex Teams account for the email you have entered to use this service.'},
+          [{
+            param: 'email',
+            msg: 'Invalid email address'
+          }])
       }
       const data = await response.json()
       this.webexRoomId = data.roomId
@@ -220,8 +232,7 @@ class User {
     }
     const meraki = new Meraki(process.env.MERAKI_API_KEY, process.env.MERAKI_BASE_URL)
     try {
-      const response = await meraki.createNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, this.email, name, this.password, authorizations, accountType, emailPasswordToUser)
-      const merakiAuthUser = await response.json()
+      const merakiAuthUser = await meraki.createNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, this.email, name, this.password, authorizations, accountType, emailPasswordToUser)
       authorizations.forEach(auth => this.merakiAuthUserIds[auth.ssidNumber] = merakiAuthUser.id)
     } catch(err) {
       console.warn(`[User][createMerakiAuthUser()] Failed to create Meraki Auth user with email=${this.email}`)

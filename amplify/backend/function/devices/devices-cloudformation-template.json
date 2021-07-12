@@ -51,6 +51,10 @@
     "storageuserStreamArn": {
       "Type": "String",
       "Default": "storageuserStreamArn"
+    },
+    "functionserverlessguestwifimerakiArn": {
+      "Type": "String",
+      "Default": "functionserverlessguestwifimerakiArn"
     }
   },
   "Conditions": {
@@ -185,7 +189,11 @@
           ]
         },
         "Runtime": "nodejs14.x",
-        "Layers": [],
+        "Layers": [
+          {
+            "Ref": "functionserverlessguestwifimerakiArn"
+          }
+        ],
         "Timeout": "25"
       }
     },

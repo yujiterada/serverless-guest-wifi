@@ -92,6 +92,13 @@ class Meraki {
   }
 
   async claimIntoOrganization(organizationId, serials) {
+    /*
+     * Response
+     *  200 - success, return {} (empty Object())
+     *  400 - Device with serial '${serial}' not found
+     *  401 - Invalid API Key, Missing API Key
+     *  404 - Invalid URL
+     */
     this.logging && console.log(`[Meraki][claimIntoOrganization] organizationId=${organizationId} serials=${serials}`)
     const path = `/organizations/${organizationId}/claim`
     const url = this.baseUrl + path
