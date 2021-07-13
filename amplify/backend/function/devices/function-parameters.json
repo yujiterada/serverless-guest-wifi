@@ -3,7 +3,7 @@
     {
       "type": "ProjectLayer",
       "resourceName": "serverlessguestwifimeraki",
-      "env": "dev",
+      "env": "prod",
       "version": "Always choose latest version",
       "isLatestVersionSelected": true
     }
