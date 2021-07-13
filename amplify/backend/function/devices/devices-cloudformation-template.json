@@ -51,6 +51,10 @@
     "storageuserStreamArn": {
       "Type": "String",
       "Default": "storageuserStreamArn"
+    },
+    "functionserverlessguestwifimerakiArn": {
+      "Type": "String",
+      "Default": "functionserverlessguestwifimerakiArn"
     }
   },
   "Conditions": {
@@ -170,11 +174,11 @@
             "MERAKI_BASE_URL": {
               "Ref": "merakiBaseUrl"
             },
-            "MERAKI_ORGANIZATION_ID": {
-              "Ref": "merakiOrganizationId"
-            },
             "MERAKI_NETWORK_ID": {
               "Ref": "merakiNetworkId"
+            },
+            "MERAKI_ORGANIZATION_ID": {
+              "Ref": "merakiOrganizationId"
             }
           }
         },
@@ -185,7 +189,11 @@
           ]
         },
         "Runtime": "nodejs14.x",
-        "Layers": [],
+        "Layers": [
+          {
+            "Ref": "functionserverlessguestwifimerakiArn"
+          }
+        ],
         "Timeout": "25"
       }
     },

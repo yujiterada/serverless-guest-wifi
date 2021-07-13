@@ -6,12 +6,12 @@
       "environmentVariableName": "MERAKI_BASE_URL"
     },
     {
-      "cloudFormationParameterName": "webexBaseUrl",
-      "environmentVariableName": "WEBEX_BASE_URL"
-    },
-    {
       "cloudFormationParameterName": "merakiNetworkId",
       "environmentVariableName": "MERAKI_NETWORK_ID"
+    },
+    {
+      "cloudFormationParameterName": "webexBaseUrl",
+      "environmentVariableName": "WEBEX_BASE_URL"
     }
   ],
   "secretNames": [

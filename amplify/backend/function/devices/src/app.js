@@ -61,7 +61,17 @@ app.use(function(req, res, next) {
 });
 
 app.get('/devices/:serial', async function(req, res) {
-  const device = new Device(req.params.serial)
+  // Obtain secrets
+  const MERAKI_API_KEY = await ssm.getParameters({
+    Names: ["MERAKI_API_KEY"].map(secretName => process.env[secretName]),
+    WithDecryption: true,
+  }).promise()
+    .then(response => response.Parameters[0].Value)
+    .catch(err => {
+      console.warn(err)
+      throw err
+    })
+  const device = new Device(MERAKI_API_KEY, req.params.serial)
   try {
     await device.init()
   } catch (err) {
@@ -117,17 +127,19 @@ app.post('/devices',
           .then(response => response.Parameters[0].Value)
       ])
 
-      const device = new Device(req.body.serial, req.body.email, MERAKI_API_KEY)
+      const device = new Device(MERAKI_API_KEY, req.body.serial, req.body.email)
       const user = new User(req.body.email)
 
       await Promise.all([device.init(), user.init()])
       // If there is a data mismatch between DynamoDB and Meraki Network,
       // then throw error
       if (device.hasDataConflict) {
+        console.warn("Data conflict between DynamoDB and Meraki Dashboard")
         throw new RESTError(Errors.InternalServerError)
       }
       // If the device already exists in DynamoDB, then throw error
       else if (device.existsInMerakiNetwork) {
+        console.warn("Device is already in DynamoDB")
         throw new RESTError({
           ...Errors.BadRequest,
           message: 'Serial is already in use.'
@@ -194,7 +206,7 @@ app.delete('/devices',
     try {
       // Obtain secrets for Webex and Meraki
       const [WEBEX_ACCESS_TOKEN, MERAKI_API_KEY] = await Promise.all([
-       ssm.getParameters({
+        ssm.getParameters({
             Names: ["WEBEX_ACCESS_TOKEN"].map(secretName => process.env[secretName]),
             WithDecryption: true,
           })
@@ -208,7 +220,7 @@ app.delete('/devices',
           .then(response => response.Parameters[0].Value)
       ])
 
-      const device = new Device(req.body.serial, req.body.email, MERAKI_API_KEY)
+      const device = new Device(MERAKI_API_KEY, req.body.serial, req.body.email)
       const user = new User(req.body.email)
 
       await Promise.all([device.init(), user.init()])
