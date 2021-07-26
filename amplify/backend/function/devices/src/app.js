@@ -33,23 +33,18 @@ See the License for the specific language governing permissions and limitations 
 const AWS = require('aws-sdk')
 const ssm = new AWS.SSM()
 
-var express = require('express')
-const { check, validationResult } = require('express-validator');
-var bodyParser = require('body-parser')
-var awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
-
-const fetch = require('node-fetch')
-const { v4: uuidv4 } = require('uuid')
+const express = require('express')
+const { check, validationResult } = require('express-validator')
+const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 
 const Device = require('./utils/Device');
 const User = require('./utils/User');
-const Webex = require('./utils/Webex');
 
 const { Errors, RESTError } = require('./utils/Errors');
 
 // declare a new express app
-var app = express()
-app.use(bodyParser.json())
+const app = express()
+app.use(express.json())
 app.use(awsServerlessExpressMiddleware.eventContext())
 
 

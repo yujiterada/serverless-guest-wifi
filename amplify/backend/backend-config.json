@@ -13,6 +13,13 @@
           ]
         },
         {
+          "category": "function",
+          "resourceName": "serverlessguestwifiwebex",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
           "category": "storage",
           "resourceName": "device",
           "attributes": [
@@ -91,6 +98,11 @@
       ]
     },
     "serverlessguestwifimeraki": {
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer",
+      "build": true
+    },
+    "serverlessguestwifiwebex": {
       "providerPlugin": "awscloudformation",
       "service": "LambdaLayer",
       "build": true
