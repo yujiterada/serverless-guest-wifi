@@ -10,7 +10,7 @@
     {
       "type": "ProjectLayer",
       "resourceName": "serverlessguestwifiwebex",
-      "env": "dev",
+      "env": "prod",
       "version": "Always choose latest version",
       "isLatestVersionSelected": true
     }
