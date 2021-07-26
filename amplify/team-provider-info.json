@@ -15,7 +15,7 @@
       "function": {
         "devices": {
           "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
-          "s3Key": "amplify-builds/devices-4561504349352b6f6363-build.zip",
+          "s3Key": "amplify-builds/devices-616b4d48414746764d69-build.zip",
           "webexBaseUrl": "https://webexapis.com/v1",
           "merakiBaseUrl": "https://api.meraki.com/api/v1",
           "merakiNetworkId": "N_698057942242497683",

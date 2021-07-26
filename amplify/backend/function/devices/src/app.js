@@ -33,9 +33,9 @@ See the License for the specific language governing permissions and limitations 
 const AWS = require('aws-sdk')
 const ssm = new AWS.SSM()
 
-var express = require('express')
-const { check, validationResult } = require('express-validator');
-var awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
+const express = require('express')
+const { check, validationResult } = require('express-validator')
+const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 
 const Device = require('./utils/Device');
 const User = require('./utils/User');
@@ -43,7 +43,7 @@ const User = require('./utils/User');
 const { Errors, RESTError } = require('./utils/Errors');
 
 // declare a new express app
-var app = express()
+const app = express()
 app.use(express.json())
 app.use(awsServerlessExpressMiddleware.eventContext())
 
