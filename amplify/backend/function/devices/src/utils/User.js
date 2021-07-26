@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid')
 
 const { Meraki } = require('/opt/nodejs/Meraki')
 const { Webex } = require('/opt/nodejs/Webex');
-const { Errors, RESTError } = require('./Errors');
+const { Errors, RESTError } = require('/opt/nodejs/Error');
 
 
 function generatePassword() {

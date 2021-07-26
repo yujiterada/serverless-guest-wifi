@@ -40,7 +40,7 @@ const awsServerlessExpressMiddleware = require('aws-serverless-express/middlewar
 const Device = require('./utils/Device');
 const User = require('./utils/User');
 
-const { Errors, RESTError } = require('./utils/Errors');
+const { Errors, RESTError } = require('/opt/nodejs/Error')
 
 // declare a new express app
 const app = express()

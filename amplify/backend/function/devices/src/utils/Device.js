@@ -3,7 +3,7 @@ const docClient = new AWS.DynamoDB.DocumentClient()
 
 const fetch = require('node-fetch')
 const { Meraki } = require('/opt/nodejs/Meraki')
-const { Errors, RESTError } = require('./Errors')
+const { Errors, RESTError } = require('/opt/nodejs/Error');
 
 
 class Device {

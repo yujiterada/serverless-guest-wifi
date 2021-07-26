@@ -20,6 +20,13 @@
           ]
         },
         {
+          "category": "function",
+          "resourceName": "serverlessguestwifierror",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
           "category": "storage",
           "resourceName": "device",
           "attributes": [

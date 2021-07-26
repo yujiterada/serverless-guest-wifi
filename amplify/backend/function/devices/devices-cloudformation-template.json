@@ -59,6 +59,10 @@
     "functionserverlessguestwifiwebexArn": {
       "Type": "String",
       "Default": "functionserverlessguestwifiwebexArn"
+    },
+    "functionserverlessguestwifierrorArn": {
+      "Type": "String",
+      "Default": "functionserverlessguestwifierrorArn"
     }
   },
   "Conditions": {
@@ -199,6 +203,9 @@
           },
           {
             "Ref": "functionserverlessguestwifiwebexArn"
+          },
+          {
+            "Ref": "functionserverlessguestwifierrorArn"
           }
         ],
         "Timeout": "25"
