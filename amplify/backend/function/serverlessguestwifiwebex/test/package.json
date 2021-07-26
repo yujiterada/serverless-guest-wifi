@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "dependencies": {
+    "chai": "^4.3.4",
+    "mocha": "^9.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "mocha"
+  }
+}

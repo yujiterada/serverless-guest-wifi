@@ -55,6 +55,10 @@
     "functionserverlessguestwifimerakiArn": {
       "Type": "String",
       "Default": "functionserverlessguestwifimerakiArn"
+    },
+    "functionserverlessguestwifiwebexArn": {
+      "Type": "String",
+      "Default": "functionserverlessguestwifiwebexArn"
     }
   },
   "Conditions": {
@@ -192,6 +196,9 @@
         "Layers": [
           {
             "Ref": "functionserverlessguestwifimerakiArn"
+          },
+          {
+            "Ref": "functionserverlessguestwifiwebexArn"
           }
         ],
         "Timeout": "25"
