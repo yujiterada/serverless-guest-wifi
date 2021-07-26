@@ -39,7 +39,6 @@ var awsServerlessExpressMiddleware = require('aws-serverless-express/middleware'
 
 const Device = require('./utils/Device');
 const User = require('./utils/User');
-const Webex = require('./utils/Webex');
 
 const { Errors, RESTError } = require('./utils/Errors');
 

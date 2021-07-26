@@ -4,7 +4,7 @@ const docClient = new AWS.DynamoDB.DocumentClient()
 const { v4: uuidv4 } = require('uuid')
 
 const { Meraki } = require('/opt/nodejs/Meraki')
-const { Webex } = require('./Webex');
+const { Webex } = require('/opt/nodejs/Webex');
 const { Errors, RESTError } = require('./Errors');
 
 
@@ -126,25 +126,27 @@ class User {
     console.log(`[User][sendWebexText()] Sending Webex text=${text} to user with email=${this.email}`)
     const webex = new Webex(webexAccessToken, process.env.WEBEX_BASE_URL)
     try {
-      const response = await webex.sendText(this.email, text)
-      if (response.status === 404) {
-        throw new RESTError({
-          ...Errors.NotFound,
-          message: 'You need a Webex Teams account for the email you have entered to use this service.'},
+      const body = {
+        toPersonEmail: this.email,
+        text: text
+      }
+      const response = await webex.createMessage(body)
+      return response
+    } catch(error) {
+      console.warn(`[User][sendWebexText()] Failed to send text=${text} to user with email=${this.email}`)
+      console.warn(error)
+      switch (error.status) {
+        case 404:
+          throw new RESTError({
+            ...Errors.NotFound,
+            message: 'You need a Webex Teams account for the email you have entered to use this service.'
+          },
           [{
             param: 'email',
             msg: 'Invalid email address'
           }])
-      }
-    } catch(err) {
-      console.warn(`[User][sendWebexText()] Failed to send text=${text} to user with email=${this.email}`)
-      // Throw error
-      if (err instanceof RESTError) {
-        throw err
-      }
-      else {
-        console.warn(err)
-        throw new RESTError(Errors.InternalServerError)
+        default:
+          throw new RESTError(Errors.InternalServerError)
       }
     }
   }
@@ -153,76 +155,76 @@ class User {
     console.log(`[User][sendWebexCard()] Sending Webex card to user with email=${this.email}`)
     const webex = new Webex(webexAccessToken, process.env.WEBEX_BASE_URL)
     try {
-      const response = await webex.sendCard(this.webexRoomId, markdown, card)
-    } catch(err) {
+      const body = {
+        roomId: this.webexRoomId,
+        markdown: markdown,
+        attachments: [card]
+      }
+      const response = await webex.createMessage(body)
+    } catch(error) {
       console.warn(`[User][sendWebexCard()] Failed to send Webex card to user with email=${this.email}`)
+      console.warn(error)
       // Throw error
-      if (err instanceof RESTError) {
-        throw err
-      }
-      else {
-        console.warn(err)
-        throw new RESTError(Errors.InternalServerError)
-      }
+      throw new RESTError(Errors.InternalServerError)
     }
   }
 
   async sendWebexWelcomeText(webexAccessToken) {
     console.log(`[User][sendWebexWelcomeText()] Sending welcome message to user with email=${this.email}`)
     const webex = new Webex(webexAccessToken, process.env.WEBEX_BASE_URL)
-    const message = "Hello. Welcome to the Meraki Guest Authentication Demo App."
     try {
-      const response = await webex.sendText(this.email, message)
-      if (response.status === 404) {
-        throw new RESTError({
-          ...Errors.NotFound,
-          message: 'You need a Webex Teams account for the email you have entered to use this service.'},
+      const body = {
+        toPersonEmail: this.email,
+        text: "Hello. Welcome to the Meraki Guest Authentication Demo App."
+      }
+      const response = await webex.createMessage(body)
+      this.webexRoomId = response.roomId
+      console.log(`[User][sendWebexWelcomeText()] Updated webexRoomId in user with email=${this.email}`)
+    } catch(error) {
+      console.warn(`[User][sendWebexWelcomeText()] Failed to send welcome text to user with email=${this.email}`)
+      console.warn(error)
+      switch (error.status) {
+        case 404:
+          throw new RESTError({
+            ...Errors.NotFound,
+            message: 'You need a Webex Teams account for the email you have entered to use this service.'
+          },
           [{
             param: 'email',
             msg: 'Invalid email address'
           }])
-      }
-      const data = await response.json()
-      this.webexRoomId = data.roomId
-      if (this.webexRoomId === null) {
-        console.warn(`[User][sendWebexWelcomeText()] Webex returned null roomId for user with email=${this.email}`)
-        throw new RESTError(Errors.InternalServerError)
-      }
-      else {
-        console.log(`[User][sendWebexWelcomeText()] Updated webexRoomId in user with email=${this.email}`)
-      }
-    } catch(err) {
-      console.warn(`[User][sendWebexWelcomeText()] Failed to send welcome text to user with email=${this.email}`)
-      // Throw error
-      if (err instanceof RESTError) {
-        throw err
-      }
-      else {
-        console.warn(err)
-        throw new RESTError(Errors.InternalServerError)
+        default:
+          throw new RESTError(Errors.InternalServerError)
       }
     }
   }
 
-  async createWebexWebhook(webexAccessToken, name, resource, event, targetUrl, filter, secret) {
-    console.log(`[User][createWebexWebhook()] Creating Webex Webhook for user with email=${this.email}`)
-    const webex = new Webex(webexAccessToken, process.env.WEBEX_BASE_URL)
-    try {
-      const response = await webex.createWebhook(name, resource, event, targetUrl, filter, secret)
-      const data = await response.json()
-      this.webexWebhookId = data.id
-    } catch(err) {
-      console.warn(`[User][createWebexWebhook()] Failed to create Webex Webhook for user with email=${this.email}`)
-      // Throw error
-      if (err instanceof RESTError) {
-        throw err
-      }
-      else {
-        console.warn(err)
-        throw new RESTError(Errors.InternalServerError)
-      }
-    }
-  }
+  // async createWebexWebhook(webexAccessToken, name, resource, event, targetUrl, filter, secret) {
+  //   console.log(`[User][createWebexWebhook()] Creating Webex Webhook for user with email=${this.email}`)
+  //   const webex = new Webex(webexAccessToken, process.env.WEBEX_BASE_URL)
+  //   try {
+  //     const body = {
+  //       name: name,
+  //       resource: resource,
+  //       event: event,
+  //       targetUrl: targetUrl,
+  //       filter: filter,
+  //       secret: secret
+  //     }
+  //     const response = await webex.createWebhook(body)
+  //     this.webexWebhookId = response.id
+  //   } catch(err) {
+  //     console.warn(`[User][createWebexWebhook()] Failed to create Webex Webhook for user with email=${this.email}`)
+  //     // Throw error
+  //     if (err instanceof RESTError) {
+  //       throw err
+  //     }
+  //     else {
+  //       console.warn(err)
+  //       throw new RESTError(Errors.InternalServerError)
+  //     }
+  //   }
+  // }
 
   async createMerakiAuthUser(authorizations, accountType, emailPasswordToUser) {
     console.log(`[User][createMerakiAuthUser()] Creating Meraki Auth user with email=${this.email}`)
