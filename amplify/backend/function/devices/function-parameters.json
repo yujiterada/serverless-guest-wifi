@@ -20,6 +20,13 @@
       "env": "dev",
       "version": "Always choose latest version",
       "isLatestVersionSelected": true
+    },
+    {
+      "type": "ProjectLayer",
+      "resourceName": "serverlessguestwifidevice",
+      "env": "dev",
+      "version": "Always choose latest version",
+      "isLatestVersionSelected": true
     }
   ],
   "environmentVariableList": [
