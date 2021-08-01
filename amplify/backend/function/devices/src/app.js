@@ -37,9 +37,10 @@ const express = require('express')
 const { check, validationResult } = require('express-validator')
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 
-const Device = require('./utils/Device');
 const User = require('./utils/User');
 
+const { Device } = require('/opt/nodejs/Device')
+const { Meraki } = require('/opt/nodejs/Meraki')
 const { Errors, RESTError } = require('/opt/nodejs/Error')
 
 // declare a new express app
@@ -66,7 +67,9 @@ app.get('/devices/:serial', async function(req, res) {
       console.warn(err)
       throw err
     })
-  const device = new Device(MERAKI_API_KEY, req.params.serial)
+  
+  const meraki = new Meraki(MERAKI_API_KEY, process.env.MERAKI_BASE_URL)
+  const device = new Device(process.env, meraki, Errors, RESTError, req.params.serial)
   try {
     await device.init()
   } catch (err) {
@@ -122,7 +125,8 @@ app.post('/devices',
           .then(response => response.Parameters[0].Value)
       ])
 
-      const device = new Device(MERAKI_API_KEY, req.body.serial, req.body.email)
+      const meraki = new Meraki(MERAKI_API_KEY, process.env.MERAKI_BASE_URL)
+      const device = new Device(process.env, meraki, Errors, RESTError, req.body.serial, req.body.email)
       const user = new User(req.body.email)
 
       await Promise.all([device.init(), user.init()])
@@ -215,7 +219,8 @@ app.delete('/devices',
           .then(response => response.Parameters[0].Value)
       ])
 
-      const device = new Device(MERAKI_API_KEY, req.body.serial, req.body.email)
+      const meraki = new Meraki(MERAKI_API_KEY, process.env.MERAKI_BASE_URL)
+      const device = new Device(process.env, meraki, Errors, RESTError, req.body.serial, req.body.email)
       const user = new User(req.body.email)
 
       await Promise.all([device.init(), user.init()])

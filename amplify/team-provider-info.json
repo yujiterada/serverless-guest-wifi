@@ -15,7 +15,7 @@
       "function": {
         "devices": {
           "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
-          "s3Key": "amplify-builds/devices-5a43664a32492f384955-build.zip",
+          "s3Key": "amplify-builds/devices-6333505676656b354473-build.zip",
           "webexBaseUrl": "https://webexapis.com/v1",
           "merakiBaseUrl": "https://api.meraki.com/api/v1",
           "merakiNetworkId": "N_698057942242497683",
@@ -44,6 +44,10 @@
         "serverlessguestwifierror": {
           "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
           "s3Key": "amplify-builds/serverlessguestwifierror-LambdaLayerVersionab3de132-build.zip"
+        },
+        "serverlessguestwifidevice": {
+          "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
+          "s3Key": "amplify-builds/serverlessguestwifidevice-LambdaLayerVersiondbe18611-build.zip"
         }
       },
       "hosting": {
