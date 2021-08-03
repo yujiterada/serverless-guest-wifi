@@ -34,6 +34,13 @@
           ]
         },
         {
+          "category": "function",
+          "resourceName": "serverlessguestwifiuser",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
           "category": "storage",
           "resourceName": "device",
           "attributes": [
@@ -127,6 +134,11 @@
       "build": true
     },
     "serverlessguestwifidevice": {
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer",
+      "build": true
+    },
+    "serverlessguestwifiuser": {
       "providerPlugin": "awscloudformation",
       "service": "LambdaLayer",
       "build": true

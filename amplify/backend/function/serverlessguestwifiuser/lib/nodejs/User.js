@@ -3,10 +3,6 @@ const docClient = new AWS.DynamoDB.DocumentClient()
 
 const { v4: uuidv4 } = require('uuid')
 
-const { Meraki } = require('/opt/nodejs/Meraki')
-const { Webex } = require('/opt/nodejs/Webex');
-const { Errors, RESTError } = require('/opt/nodejs/Error');
-
 
 function generatePassword() {
   let length = 8,
@@ -18,8 +14,16 @@ function generatePassword() {
   return retVal;
 }
 
+
 class User {
-  constructor(email) {
+  constructor(env={}, Meraki, Webex, Errors, RESTError, email='') {
+    this.env = env
+    /*
+     * env = {
+     *   MERAKI_NETWORK_ID: '',
+     *   STORAGE_USER_NAME: ''
+     * }
+     */
     this.firstName = ''
     this.lastName = ''
     this.email = email
@@ -32,6 +36,10 @@ class User {
     this.secret = uuidv4()
     this.existsInDynamoDB = false
     this.password = generatePassword()
+    this.meraki = Meraki
+    this.webex = Webex
+    this.RESTError = RESTError
+    this.Errors = Errors
   }
 
   async init() {
@@ -40,7 +48,7 @@ class User {
     // Check if user exists in DynamoDB
     // If the user exists, change this.existsInDynamoDB flag to true
     const params = {
-      TableName: process.env.STORAGE_USER_NAME,
+      TableName: this.env.STORAGE_USER_NAME,
       Key: {
         email: this.email
       }
@@ -69,7 +77,7 @@ class User {
     } catch (e) {
       console.warn(`[User][init()] Failed to get user with email=${this.email} in DynamoDB`)
       // Throw error
-      throw new RESTError(Errors.InternalServerError)
+      throw new this.RESTError(Errors.InternalServerError)
     }
   }
 
@@ -78,7 +86,7 @@ class User {
 
     try {
       const params = {
-        TableName: process.env.STORAGE_USER_NAME,
+        TableName: this.env.STORAGE_USER_NAME,
         Item: {
           email: this.email,
           firstName: this.firstName,
@@ -100,7 +108,7 @@ class User {
     } catch (err) {
       console.warn(`[User][commitToDynamoDB()] Failed to commit user with email=${this.email} in DynamoDB, ${err}`)
       // Throw error
-      throw new RESTError(Errors.InternalServerError)
+      throw new this.RESTError(Errors.InternalServerError)
     }
   }
 
@@ -124,20 +132,19 @@ class User {
 
   async sendWebexText(webexAccessToken, text) {
     console.log(`[User][sendWebexText()] Sending Webex text=${text} to user with email=${this.email}`)
-    const webex = new Webex(webexAccessToken, process.env.WEBEX_BASE_URL)
     try {
       const body = {
         toPersonEmail: this.email,
         text: text
       }
-      const response = await webex.createMessage(body)
+      const response = await this.webex.createMessage(body)
       return response
     } catch(error) {
       console.warn(`[User][sendWebexText()] Failed to send text=${text} to user with email=${this.email}`)
       console.warn(error)
       switch (error.status) {
         case 404:
-          throw new RESTError({
+          throw new this.RESTError({
             ...Errors.NotFound,
             message: 'You need a Webex Teams account for the email you have entered to use this service.'
           },
@@ -146,38 +153,36 @@ class User {
             msg: 'Invalid email address'
           }])
         default:
-          throw new RESTError(Errors.InternalServerError)
+          throw new this.RESTError(Errors.InternalServerError)
       }
     }
   }
 
   async sendWebexCard(webexAccessToken, markdown, card) {
     console.log(`[User][sendWebexCard()] Sending Webex card to user with email=${this.email}`)
-    const webex = new Webex(webexAccessToken, process.env.WEBEX_BASE_URL)
     try {
       const body = {
         roomId: this.webexRoomId,
         markdown: markdown,
         attachments: [card]
       }
-      const response = await webex.createMessage(body)
+      const response = await this.webex.createMessage(body)
     } catch(error) {
       console.warn(`[User][sendWebexCard()] Failed to send Webex card to user with email=${this.email}`)
       console.warn(error)
       // Throw error
-      throw new RESTError(Errors.InternalServerError)
+      throw new this.RESTError(Errors.InternalServerError)
     }
   }
 
   async sendWebexWelcomeText(webexAccessToken) {
     console.log(`[User][sendWebexWelcomeText()] Sending welcome message to user with email=${this.email}`)
-    const webex = new Webex(webexAccessToken, process.env.WEBEX_BASE_URL)
     try {
       const body = {
         toPersonEmail: this.email,
         text: "Hello. Welcome to the Meraki Guest Authentication Demo App."
       }
-      const response = await webex.createMessage(body)
+      const response = await this.webex.createMessage(body)
       this.webexRoomId = response.roomId
       console.log(`[User][sendWebexWelcomeText()] Updated webexRoomId in user with email=${this.email}`)
     } catch(error) {
@@ -185,7 +190,7 @@ class User {
       console.warn(error)
       switch (error.status) {
         case 404:
-          throw new RESTError({
+          throw new this.RESTError({
             ...Errors.NotFound,
             message: 'You need a Webex Teams account for the email you have entered to use this service.'
           },
@@ -194,14 +199,13 @@ class User {
             msg: 'Invalid email address'
           }])
         default:
-          throw new RESTError(Errors.InternalServerError)
+          throw new this.RESTError(Errors.InternalServerError)
       }
     }
   }
 
   // async createWebexWebhook(webexAccessToken, name, resource, event, targetUrl, filter, secret) {
   //   console.log(`[User][createWebexWebhook()] Creating Webex Webhook for user with email=${this.email}`)
-  //   const webex = new Webex(webexAccessToken, process.env.WEBEX_BASE_URL)
   //   try {
   //     const body = {
   //       name: name,
@@ -211,7 +215,7 @@ class User {
   //       filter: filter,
   //       secret: secret
   //     }
-  //     const response = await webex.createWebhook(body)
+  //     const response = await this.webex.createWebhook(body)
   //     this.webexWebhookId = response.id
   //   } catch(err) {
   //     console.warn(`[User][createWebexWebhook()] Failed to create Webex Webhook for user with email=${this.email}`)
@@ -221,7 +225,7 @@ class User {
   //     }
   //     else {
   //       console.warn(err)
-  //       throw new RESTError(Errors.InternalServerError)
+  //       throw new this.RESTError(Errors.InternalServerError)
   //     }
   //   }
   // }
@@ -232,9 +236,8 @@ class User {
     if (!this.password) {
       this.password = generatePassword()
     }
-    const meraki = new Meraki(process.env.MERAKI_API_KEY, process.env.MERAKI_BASE_URL)
     try {
-      const merakiAuthUser = await meraki.createNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, this.email, name, this.password, authorizations, accountType, emailPasswordToUser)
+      const merakiAuthUser = await this.meraki.createNetworkMerakiAuthUser(this.env.MERAKI_NETWORK_ID, this.email, name, this.password, authorizations, accountType, emailPasswordToUser)
       authorizations.forEach(auth => this.merakiAuthUserIds[auth.ssidNumber] = merakiAuthUser.id)
     } catch(err) {
       console.warn(`[User][createMerakiAuthUser()] Failed to create Meraki Auth user with email=${this.email}`)
@@ -244,20 +247,19 @@ class User {
       }
       else {
         console.warn(err)
-        throw new RESTError(Errors.InternalServerError)
+        throw new this.RESTError(Errors.InternalServerError)
       }
     }
   }
 
   async updateMerakiAuthUser(authorizations, emailPasswordToUser) {
     console.log(`[User][updateMerakiAuthUser()] Updating Meraki Auth user with email=${this.email}`)
-    const meraki = new Meraki(process.env.MERAKI_API_KEY, process.env.MERAKI_BASE_URL)
     const merakiAuthUserId = this.merakiAuthUserIds[authorizations[0].ssidNumber]
     if (!this.password) {
       this.password = generatePassword()
     }
     try {
-      const response = await meraki.updateNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, merakiAuthUserId, this.password, authorizations, emailPasswordToUser)
+      const response = await this.meraki.updateNetworkMerakiAuthUser(this.env.MERAKI_NETWORK_ID, merakiAuthUserId, this.password, authorizations, emailPasswordToUser)
       const merakiAuthUser = await response.json()
     } catch(err) {
       console.warn(`[User][updateMerakiAuthUser()] Failed to update Meraki Auth user with email=${this.email}`)
@@ -267,10 +269,10 @@ class User {
       }
       else {
         console.warn(err)
-        throw new RESTError(Errors.InternalServerError)
+        throw new this.RESTError(Errors.InternalServerError)
       }
     }
   }
 }
 
-module.exports = User
+module.exports = { User }

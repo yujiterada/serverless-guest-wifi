@@ -67,6 +67,10 @@
     "functionserverlessguestwifideviceArn": {
       "Type": "String",
       "Default": "functionserverlessguestwifideviceArn"
+    },
+    "functionserverlessguestwifiuserArn": {
+      "Type": "String",
+      "Default": "functionserverlessguestwifiuserArn"
     }
   },
   "Conditions": {
@@ -213,6 +217,9 @@
           },
           {
             "Ref": "functionserverlessguestwifideviceArn"
+          },
+          {
+            "Ref": "functionserverlessguestwifiuserArn"
           }
         ],
         "Timeout": "25"
