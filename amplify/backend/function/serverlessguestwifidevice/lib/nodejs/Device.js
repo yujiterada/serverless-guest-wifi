@@ -4,17 +4,9 @@ const docClient = new AWS.DynamoDB.DocumentClient()
 
 class Device {
   constructor(env={}, Meraki, Errors, RESTError, serial, email='') {
-    this.secret = {}
-    /*
-     * secret = {
-     *   MERAKI_API_KEY: ''
-     * }
-     */
     this.env = env
     /*
      * env = {
-     *   MERAKI_BASE_URL: '',
-     *   MERAKI_ORGANIZATION_ID: '',
      *   MERAKI_NETWORK_ID: '',
      *   STORAGE_DEVICE_NAME: ''
      * }
