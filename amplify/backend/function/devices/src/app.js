@@ -164,7 +164,7 @@ app.post('/devices',
         device.addToMerakiNetwork(),
         device.commitToDynamoDB(),
         user.commitToDynamoDB(),
-        user.sendWebexText(WEBEX_ACCESS_TOKEN, `${req.body.serial} added to Meraki Guest Authentication Demo App.`)])
+        user.sendWebexText(WEBEX_ACCESS_TOKEN, `${req.body.serial} added to Guest Wi-Fi Demo App.`)])
     } catch(err) {
       if (err instanceof RESTError) {
         return res.status(err.status).json({
@@ -247,7 +247,7 @@ app.delete('/devices',
           device.removeFromDynamoDB(),
           device.removeFromMerakiNetwork(),
           user.commitToDynamoDB(),
-          user.sendWebexText(WEBEX_ACCESS_TOKEN, `${req.body.serial} removed from Meraki Guest Authentication Demo App.`)
+          user.sendWebexText(WEBEX_ACCESS_TOKEN, `${req.body.serial} removed from Guest Wi-Fi Demo App.`)
         ])
 
     } catch(err) {

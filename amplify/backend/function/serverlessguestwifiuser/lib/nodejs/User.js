@@ -180,7 +180,7 @@ class User {
     try {
       const body = {
         toPersonEmail: this.email,
-        text: "Hello. Welcome to the Meraki Guest Authentication Demo App."
+        text: "Hello. Welcome to the Guest Wi-Fi Demo App."
       }
       const response = await this.webex.createMessage(body)
       this.webexRoomId = response.roomId
