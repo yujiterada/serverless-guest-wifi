@@ -42,15 +42,13 @@ const { check, validationResult } = require('express-validator');
 var bodyParser = require('body-parser')
 var awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 
-const fetch = require('node-fetch')
 const { v4: uuidv4 } = require('uuid')
 
-const Device = require('./utils/Device');
 const User = require('./utils/User');
-const { Webex, BinaryCard } = require('./utils/Webex');
+const { BinaryCard } = require('./utils/Webex');
 const AccessRequest = require('./utils/AccessRequest');
 
-const { Errors, RESTError } = require('./utils/Errors');
+const { RESTError } = require('./utils/Errors');
 
 // declare a new express app
 var app = express()
