@@ -37,10 +37,11 @@ const express = require('express')
 const { check, validationResult } = require('express-validator')
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 
-const Device = require('./utils/Device');
-const User = require('./utils/User');
-
-const { Errors, RESTError } = require('./utils/Errors');
+const { Device } = require('/opt/nodejs/Device')
+const { Meraki } = require('/opt/nodejs/Meraki')
+const { Webex } = require('/opt/nodejs/Webex')
+const { Errors, RESTError } = require('/opt/nodejs/Error')
+const { User } = require('/opt/nodejs/User')
 
 // declare a new express app
 const app = express()
@@ -66,7 +67,9 @@ app.get('/devices/:serial', async function(req, res) {
       console.warn(err)
       throw err
     })
-  const device = new Device(MERAKI_API_KEY, req.params.serial)
+  
+  const meraki = new Meraki(MERAKI_API_KEY, process.env.MERAKI_BASE_URL)
+  const device = new Device(process.env, meraki, Errors, RESTError, req.params.serial)
   try {
     await device.init()
   } catch (err) {
@@ -122,8 +125,10 @@ app.post('/devices',
           .then(response => response.Parameters[0].Value)
       ])
 
-      const device = new Device(MERAKI_API_KEY, req.body.serial, req.body.email)
-      const user = new User(req.body.email)
+      const meraki = new Meraki(MERAKI_API_KEY, process.env.MERAKI_BASE_URL)
+      const webex = new Webex(WEBEX_ACCESS_TOKEN, process.env.WEBEX_BASE_URL)
+      const device = new Device(process.env, meraki, Errors, RESTError, req.body.serial, req.body.email)
+      const user = new User(process.env, meraki, webex, Errors, RESTError, req.body.email)
 
       await Promise.all([device.init(), user.init()])
       // If there is a data mismatch between DynamoDB and Meraki Network,
@@ -159,7 +164,7 @@ app.post('/devices',
         device.addToMerakiNetwork(),
         device.commitToDynamoDB(),
         user.commitToDynamoDB(),
-        user.sendWebexText(WEBEX_ACCESS_TOKEN, `${req.body.serial} added to Meraki Guest Authentication Demo App.`)])
+        user.sendWebexText(WEBEX_ACCESS_TOKEN, `${req.body.serial} added to Guest Wi-Fi Demo App.`)])
     } catch(err) {
       if (err instanceof RESTError) {
         return res.status(err.status).json({
@@ -215,8 +220,10 @@ app.delete('/devices',
           .then(response => response.Parameters[0].Value)
       ])
 
-      const device = new Device(MERAKI_API_KEY, req.body.serial, req.body.email)
-      const user = new User(req.body.email)
+      const meraki = new Meraki(MERAKI_API_KEY, process.env.MERAKI_BASE_URL)
+      const webex = new Webex(WEBEX_ACCESS_TOKEN, process.env.WEBEX_BASE_URL)
+      const device = new Device(process.env, meraki, Errors, RESTError, req.body.serial, req.body.email)
+      const user = new User(process.env, meraki, webex, Errors, RESTError, req.body.email)
 
       await Promise.all([device.init(), user.init()])
       // If there is a data mismatch between DynamoDB and Meraki Network,
@@ -240,7 +247,7 @@ app.delete('/devices',
           device.removeFromDynamoDB(),
           device.removeFromMerakiNetwork(),
           user.commitToDynamoDB(),
-          user.sendWebexText(WEBEX_ACCESS_TOKEN, `${req.body.serial} removed from Meraki Guest Authentication Demo App.`)
+          user.sendWebexText(WEBEX_ACCESS_TOKEN, `${req.body.serial} removed from Guest Wi-Fi Demo App.`)
         ])
 
     } catch(err) {

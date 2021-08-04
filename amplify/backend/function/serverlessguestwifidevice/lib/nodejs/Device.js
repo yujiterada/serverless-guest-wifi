@@ -1,13 +1,16 @@
 const AWS = require('aws-sdk')
 const docClient = new AWS.DynamoDB.DocumentClient()
 
-const fetch = require('node-fetch')
-const { Meraki } = require('/opt/nodejs/Meraki')
-const { Errors, RESTError } = require('./Errors')
-
 
 class Device {
-  constructor(merakiApiKey, serial, email='', ) {
+  constructor(env={}, Meraki, Errors, RESTError, serial, email='') {
+    this.env = env
+    /*
+     * env = {
+     *   MERAKI_NETWORK_ID: '',
+     *   STORAGE_DEVICE_NAME: ''
+     * }
+     */
     this.serial = serial
     this.email = email
     this.existsInDynamoDB = false
@@ -15,8 +18,9 @@ class Device {
     this.existsInMerakiNetwork = false
     this.emailMatches = false
     this.hasDataConflict = false
-    this.merakiApiKey = merakiApiKey
-    this.meraki = new Meraki(this.merakiApiKey, process.env.MERAKI_BASE_URL)
+    this.meraki = Meraki
+    this.RESTError = RESTError
+    this.Errors = Errors
   }
 
   async init() {
@@ -30,12 +34,12 @@ class Device {
       await Promise.all([this.queryDynamoDB(), this.queryMerakiDashboard()])
     } catch(err) {
       console.warn(`[Device][init()] Failed to look up device with serial=${this.serial} in DynamoDB and Meraki Dashboard`)
-      if (err instanceof RESTError) {
+      if (err instanceof this.RESTError) {
         throw err
       }
       else {
         console.warn(err)
-        throw new RESTError(Errors.InternalServerError)
+        throw new this.RESTError(this.Errors.InternalServerError)
       }
     } finally {
       console.log(`[Device][init()] Check device with serial=${this.serial} for data conflict in DynamoDB and Meraki Dashboard`)
@@ -62,7 +66,7 @@ class Device {
   async queryDynamoDB() {
     console.log(`[Device][queryDynamoDB()] Querying device with serial=${this.serial} in DynamoDB`)
     const params = {
-      TableName: process.env.STORAGE_DEVICE_NAME,
+      TableName: this.env.STORAGE_DEVICE_NAME,
       Key: {
         serial: this.serial
       }
@@ -77,7 +81,7 @@ class Device {
         // then throw an error
         if (this.email && this.email != device.email) {
           console.warn(`[Device][queryDynamoDB()] Requested email=${this.email} does not match email=${device.email} in DynamoDB`)
-          throw new RESTError(Errors.NotFound)
+          throw new this.RESTError(this.Errors.NotFound)
         }
         this.serial = device.serial
         this.email = device.email
@@ -90,13 +94,13 @@ class Device {
     } catch(err) {
       console.warn(`[Device][queryDynamoDB()] Failed to get device with serial=${this.serial} in DynamoDB`)
       this.error = true
-      if (err instanceof RESTError) {
+      if (err instanceof this.RESTError) {
         throw err
       }
       else {
         console.warn(err)
         // Throw error
-        throw new RESTError(Errors.InternalServerError)
+        throw new this.RESTError(this.Errors.InternalServerError)
       }
     }
   }
@@ -104,7 +108,7 @@ class Device {
   async queryMerakiDashboard() {
     console.log(`[Device][queryMerakiDashboard()] Querying device with serial=${this.serial} in Meraki Dashboard`)
     try {
-      const data = await this.meraki.getOrganizationInventoryDevice(process.env.MERAKI_ORGANIZATION_ID, this.serial)
+      const data = await this.meraki.getOrganizationInventoryDevice(this.env.MERAKI_ORGANIZATION_ID, this.serial)
       // If networkId is not null, then the serial exists in the network
       if (data.networkId) {
         console.log(`[Device][queryMerakiDashboard()] Found device with serial=${this.serial} in Meraki Network`)
@@ -131,7 +135,7 @@ class Device {
           break
         default:
           this.error = true
-          throw new RESTError(Errors.InternalServerError)
+          throw new this.RESTError(this.Errors.InternalServerError)
       }
     }
   }
@@ -140,7 +144,7 @@ class Device {
     console.log(`[Device][commitToDynamoDB()] Committing device with serial=${this.serial} in DynamoDB`)
     try {
       const params = {
-        TableName: process.env.STORAGE_DEVICE_NAME,
+        TableName: this.env.STORAGE_DEVICE_NAME,
         Item: {
           serial: this.serial,
           email: this.email
@@ -154,14 +158,14 @@ class Device {
     } catch (err) {
       console.warn(`[Device][commitToDynamoDB()] Failed to commit device with email=${this.serial} in DynamoDB, ${err}`)
       // Throw error
-      throw new RESTError(Errors.InternalServerError)
+      throw new this.RESTError(this.Errors.InternalServerError)
     }
   }
 
   async addToMerakiInventory() {
     console.log(`[Device][addToMerakiInventory()] Adding device with serial=${this.serial} in Meraki inventory`)
     try {
-      const response = await this.meraki.claimIntoOrganization(process.env.MERAKI_ORGANIZATION_ID, [this.serial])
+      const response = await this.meraki.claimIntoOrganization(this.env.MERAKI_ORGANIZATION_ID, [this.serial])
       this.existsInMerakiInventory = true
       console.info(`[Device][addToMerakiInventory()] Success adding device with serial=${this.serial} in Meraki inventory`)
     } catch(error) {
@@ -170,17 +174,17 @@ class Device {
       this.existsInMerakiInventory = false
       switch (error.status) {
         case 400:
-          throw new RESTError({
-            ...Errors.BadRequest,
+          throw new this.RESTError({
+            ...this.Errors.BadRequest,
             message: error.message
           }, [{
             param: 'serial',
             msg: 'Invalid serial number'
           }])
         case 404:
-          throw new RESTError(Errors.NotFound)
+          throw new this.RESTError(this.Errors.NotFound)
         default:
-          throw new RESTError(Errors.InternalServerError)
+          throw new this.RESTError(this.Errors.InternalServerError)
       }
     } finally {
       this.checkDataConflict()
@@ -190,7 +194,7 @@ class Device {
   async addToMerakiNetwork() {
     console.log(`[Device][addToMerakiNetwork()] Adding device with serial=${this.serial} in Meraki Network`)
     try {
-      const response = await this.meraki.claimNetworkDevices(process.env.MERAKI_NETWORK_ID, [this.serial])
+      const response = await this.meraki.claimNetworkDevices(this.env.MERAKI_NETWORK_ID, [this.serial])
       console.log(`[Device][addToMerakiNetwork()] Added device with serial=${this.serial} in Meraki Network`)
       this.existsInMerakiNetwork = true
     } catch(error) {
@@ -200,8 +204,8 @@ class Device {
       switch (response.status) {
         case 400:
           if (error.message === `Device with serial ${req.body.serial} is already claimed`) {
-            throw new RESTError({
-              ...Errors.BadRequest, 
+            throw new this.RESTError({
+              ...this.Errors.BadRequest, 
               message: 'Serial is already claimed in a different Meraki Organization or if you have just unclaimed from an organization, please try again in 30 minutes.',
               'invalid-params': [
                 {
@@ -212,12 +216,12 @@ class Device {
             })
           }
           else {
-            throw new RESTError(Errors.BadRequest)
+            throw new this.RESTError(this.Errors.BadRequest)
           }
         case 404:
-          throw new RESTError(Errors.NotFound)
+          throw new this.RESTError(this.Errors.NotFound)
         default:
-          throw new RESTError(Errors.InternalServerError)
+          throw new this.RESTError(this.Errors.InternalServerError)
       }
     } finally {
       this.checkDataConflict()
@@ -228,7 +232,7 @@ class Device {
     console.log(`[Device][removeFromDynamoDB()] Removing device with serial=${this.serial} in DynamoDB`)
 
     const params = {
-      TableName: process.env.STORAGE_DEVICE_NAME,
+      TableName: this.env.STORAGE_DEVICE_NAME,
       Key: {
         serial: this.serial
       }
@@ -241,14 +245,14 @@ class Device {
     } catch (err) {
       console.warn(`[Device][removeFromDynamoDB()] Failed to remove device with serial=${this.serial} in DynamoDB`)
       console.warn(err)
-      throw new RESTError(Errors.InternalServerError)
+      throw new this.RESTError(this.Errors.InternalServerError)
     }
   }
 
   async removeFromMerakiNetwork() {
     console.log(`[Device][removeFromMerakiNetwork()] Removing device with serial=${this.serial} in Meraki Network`)
     try {
-      const response = await this.meraki.removeNetworkDevices(process.env.MERAKI_NETWORK_ID, this.serial)
+      const response = await this.meraki.removeNetworkDevices(this.env.MERAKI_NETWORK_ID, this.serial)
       console.log(`[Device][removeFromMerakiNetwork()] Removed device with serial=${this.serial} in Meraki Network`)
       this.existsInMerakiInventory = false
       this.existsInMerakiNetwork = false
@@ -259,9 +263,9 @@ class Device {
         case 404:
           this.existsInMerakiInventory = false
           this.existsInMerakiNetwork = false
-          throw new RESTError(Errors.NotFound)
+          throw new this.RESTError(this.Errors.NotFound)
         default:
-          throw new RESTError(Errors.InternalServerError)
+          throw new this.RESTError(this.Errors.InternalServerError)
       }
     } finally {
       this.checkDataConflict()
@@ -269,4 +273,4 @@ class Device {
   }
 }
 
-module.exports = Device
+module.exports = { Device }

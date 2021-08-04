@@ -20,6 +20,27 @@
           ]
         },
         {
+          "category": "function",
+          "resourceName": "serverlessguestwifierror",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "serverlessguestwifidevice",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "serverlessguestwifiuser",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
           "category": "storage",
           "resourceName": "device",
           "attributes": [
@@ -103,6 +124,21 @@
       "build": true
     },
     "serverlessguestwifiwebex": {
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer",
+      "build": true
+    },
+    "serverlessguestwifierror": {
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer",
+      "build": true
+    },
+    "serverlessguestwifidevice": {
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer",
+      "build": true
+    },
+    "serverlessguestwifiuser": {
       "providerPlugin": "awscloudformation",
       "service": "LambdaLayer",
       "build": true

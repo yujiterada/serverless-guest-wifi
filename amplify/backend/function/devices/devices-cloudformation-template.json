@@ -59,6 +59,18 @@
     "functionserverlessguestwifiwebexArn": {
       "Type": "String",
       "Default": "functionserverlessguestwifiwebexArn"
+    },
+    "functionserverlessguestwifierrorArn": {
+      "Type": "String",
+      "Default": "functionserverlessguestwifierrorArn"
+    },
+    "functionserverlessguestwifideviceArn": {
+      "Type": "String",
+      "Default": "functionserverlessguestwifideviceArn"
+    },
+    "functionserverlessguestwifiuserArn": {
+      "Type": "String",
+      "Default": "functionserverlessguestwifiuserArn"
     }
   },
   "Conditions": {
@@ -199,6 +211,15 @@
           },
           {
             "Ref": "functionserverlessguestwifiwebexArn"
+          },
+          {
+            "Ref": "functionserverlessguestwifierrorArn"
+          },
+          {
+            "Ref": "functionserverlessguestwifideviceArn"
+          },
+          {
+            "Ref": "functionserverlessguestwifiuserArn"
           }
         ],
         "Timeout": "25"
