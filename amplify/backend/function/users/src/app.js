@@ -39,7 +39,6 @@ const ssm = new AWS.SSM()
 
 var express = require('express')
 const { check, validationResult } = require('express-validator');
-var bodyParser = require('body-parser')
 var awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 
 const { v4: uuidv4 } = require('uuid')
@@ -52,7 +51,7 @@ const { RESTError } = require('./utils/Errors');
 
 // declare a new express app
 var app = express()
-app.use(bodyParser.json())
+app.use(express.json())
 app.use(awsServerlessExpressMiddleware.eventContext())
 
 // Enable CORS for all methods
