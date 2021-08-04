@@ -21,14 +21,14 @@
         },
         {
           "category": "function",
-          "resourceName": "serverlessguestwifierror",
+          "resourceName": "serverlessguestwifidevice",
           "attributes": [
             "Arn"
           ]
         },
         {
           "category": "function",
-          "resourceName": "serverlessguestwifidevice",
+          "resourceName": "serverlessguestwifierror",
           "attributes": [
             "Arn"
           ]
