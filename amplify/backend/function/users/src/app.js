@@ -37,20 +37,20 @@ Amplify Params - DO NOT EDIT */
 const AWS = require('aws-sdk')
 const ssm = new AWS.SSM()
 
-var express = require('express')
+const express = require('express')
 const { check, validationResult } = require('express-validator');
-var awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
+const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 
 const { v4: uuidv4 } = require('uuid')
 
-const User = require('./utils/User');
-const { BinaryCard } = require('./utils/Webex');
-const AccessRequest = require('./utils/AccessRequest');
+const User = require('./utils/User')
+const { BinaryCard } = require('./utils/Webex')
+const AccessRequest = require('./utils/AccessRequest')
 
-const { RESTError } = require('./utils/Errors');
+const { RESTError } = require('./utils/Errors')
 
 // declare a new express app
-var app = express()
+const app = express()
 app.use(express.json())
 app.use(awsServerlessExpressMiddleware.eventContext())
 
