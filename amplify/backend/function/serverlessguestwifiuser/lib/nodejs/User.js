@@ -204,31 +204,31 @@ class User {
     }
   }
 
-  // async createWebexWebhook(webexAccessToken, name, resource, event, targetUrl, filter, secret) {
-  //   console.log(`[User][createWebexWebhook()] Creating Webex Webhook for user with email=${this.email}`)
-  //   try {
-  //     const body = {
-  //       name: name,
-  //       resource: resource,
-  //       event: event,
-  //       targetUrl: targetUrl,
-  //       filter: filter,
-  //       secret: secret
-  //     }
-  //     const response = await this.webex.createWebhook(body)
-  //     this.webexWebhookId = response.id
-  //   } catch(err) {
-  //     console.warn(`[User][createWebexWebhook()] Failed to create Webex Webhook for user with email=${this.email}`)
-  //     // Throw error
-  //     if (err instanceof RESTError) {
-  //       throw err
-  //     }
-  //     else {
-  //       console.warn(err)
-  //       throw new this.RESTError(Errors.InternalServerError)
-  //     }
-  //   }
-  // }
+  async createWebexWebhook(webexAccessToken, name, resource, event, targetUrl, filter, secret) {
+    console.log(`[User][createWebexWebhook()] Creating Webex Webhook for user with email=${this.email}`)
+    try {
+      const body = {
+        name: name,
+        resource: resource,
+        event: event,
+        targetUrl: targetUrl,
+        filter: filter,
+        secret: secret
+      }
+      const response = await this.webex.createWebhook(body)
+      this.webexWebhookId = response.id
+    } catch(err) {
+      console.warn(`[User][createWebexWebhook()] Failed to create Webex Webhook for user with email=${this.email}`)
+      // Throw error
+      if (err instanceof RESTError) {
+        throw err
+      }
+      else {
+        console.warn(err)
+        throw new this.RESTError(Errors.InternalServerError)
+      }
+    }
+  }
 
   async createMerakiAuthUser(authorizations, accountType, emailPasswordToUser) {
     console.log(`[User][createMerakiAuthUser()] Creating Meraki Auth user with email=${this.email}`)
