@@ -51,7 +51,7 @@ const { Errors, RESTError } = require('./utils/Errors');
 
 // declare a new express app
 var app = express()
-app.use(bodyParser.json())
+app.use(express.json())
 app.use(awsServerlessExpressMiddleware.eventContext())
 // Enable CORS for all methods
 app.use(function(req, res, next) {
