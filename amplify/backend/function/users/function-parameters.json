@@ -3,28 +3,28 @@
     {
       "type": "ProjectLayer",
       "resourceName": "serverlessguestwifiwebex",
-      "env": "dev",
+      "env": "prod",
       "version": "Always choose latest version",
       "isLatestVersionSelected": true
     },
     {
       "type": "ProjectLayer",
       "resourceName": "serverlessguestwifierror",
-      "env": "dev",
+      "env": "prod",
       "version": "Always choose latest version",
       "isLatestVersionSelected": true
     },
     {
       "type": "ProjectLayer",
       "resourceName": "serverlessguestwifiuser",
-      "env": "dev",
+      "env": "prod",
       "version": "Always choose latest version",
       "isLatestVersionSelected": true
     },
     {
       "type": "ProjectLayer",
       "resourceName": "serverlessguestwifiaccessrequest",
-      "env": "dev",
+      "env": "prod",
       "version": "Always choose latest version",
       "isLatestVersionSelected": true
     }

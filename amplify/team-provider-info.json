@@ -90,7 +90,7 @@
         },
         "users": {
           "deploymentBucketName": "amplify-serverlessguestwifi-prod-204330-deployment",
-          "s3Key": "amplify-builds/users-6f42764a6b443766366a-build.zip",
+          "s3Key": "amplify-builds/users-75706445413033417858-build.zip",
           "webexBaseUrl": "https://webexapis.com/v1"
         },
         "webhooks": {
@@ -106,7 +106,7 @@
         },
         "serverlessguestwifiwebex": {
           "deploymentBucketName": "amplify-serverlessguestwifi-prod-204330-deployment",
-          "s3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersionbbaeb954-build.zip"
+          "s3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersionce70cc19-build.zip"
         },
         "serverlessguestwifierror": {
           "deploymentBucketName": "amplify-serverlessguestwifi-prod-204330-deployment",
@@ -118,7 +118,11 @@
         },
         "serverlessguestwifiuser": {
           "deploymentBucketName": "amplify-serverlessguestwifi-prod-204330-deployment",
-          "s3Key": "amplify-builds/serverlessguestwifiuser-LambdaLayerVersionc5eab324-build.zip"
+          "s3Key": "amplify-builds/serverlessguestwifiuser-LambdaLayerVersion1881f197-build.zip"
+        },
+        "serverlessguestwifiaccessrequest": {
+          "deploymentBucketName": "amplify-serverlessguestwifi-prod-204330-deployment",
+          "s3Key": "amplify-builds/serverlessguestwifiaccessrequest-LambdaLayerVersion53a4f56d-build.zip"
         }
       },
       "hosting": {

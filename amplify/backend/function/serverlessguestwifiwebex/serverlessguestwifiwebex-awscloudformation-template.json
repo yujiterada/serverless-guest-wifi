@@ -20,7 +20,7 @@
     }
   },
   "Resources": {
-    "LambdaLayerVersionae779a81": {
+    "LambdaLayerVersionce70cc19": {
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
         "CompatibleRuntimes": {
@@ -51,19 +51,19 @@
       "DeletionPolicy": "Delete",
       "UpdateReplacePolicy": "Retain"
     },
-    "LambdaLayerPermissionPrivateae779a81": {
+    "LambdaLayerPermissionPrivatece70cc19": {
       "Type": "AWS::Lambda::LayerVersionPermission",
       "Properties": {
         "Action": "lambda:GetLayerVersion",
         "LayerVersionArn": {
-          "Ref": "LambdaLayerVersionae779a81"
+          "Ref": "LambdaLayerVersionce70cc19"
         },
         "Principal": {
           "Ref": "AWS::AccountId"
         }
       }
     },
-    "LambdaLayerVersion28e02c8d": {
+    "LambdaLayerVersionbbaeb954": {
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
         "CompatibleRuntimes": [
@@ -73,9 +73,9 @@
           "S3Bucket": {
             "Ref": "deploymentBucketName"
           },
-          "S3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersion28e02c8d-build.zip"
+          "S3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersionbbaeb954-build.zip"
         },
-        "Description": "Updated layer version 2021-07-25T23:48:11.185Z",
+        "Description": "Updated layer version 2021-07-26T01:40:59.362Z",
         "LayerName": {
           "Fn::Sub": [
             "serverlessguestwifiwebex-${env}",
@@ -90,11 +90,11 @@
       "DeletionPolicy": "Delete",
       "UpdateReplacePolicy": "Retain"
     },
-    "LambdaLayerPermissionPrivate28e02c8d": {
+    "LambdaLayerPermissionPrivatebbaeb954": {
       "Type": "AWS::Lambda::LayerVersionPermission",
       "Properties": {
         "Action": "lambda:GetLayerVersion",
-        "LayerVersionArn": "arn:aws:lambda:us-west-2:107524997680:layer:serverlessguestwifiwebex-dev:2",
+        "LayerVersionArn": "arn:aws:lambda:us-west-2:107524997680:layer:serverlessguestwifiwebex-prod:1",
         "Principal": {
           "Ref": "AWS::AccountId"
         }
@@ -104,7 +104,7 @@
   "Outputs": {
     "Arn": {
       "Value": {
-        "Ref": "LambdaLayerVersionae779a81"
+        "Ref": "LambdaLayerVersionce70cc19"
       }
     }
   }
