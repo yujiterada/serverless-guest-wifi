@@ -145,7 +145,7 @@ app.post('/users',
       const accessRequestId = accessRequest.id
 
       // Send approval request with Webex card
-      const approvalCard = GuestArrivalCard(`${guest.firstName} ${guest.lastName}`, `${guest.organization}`, accessRequestId)
+      const approvalCard = GuestArrivalCard(`${guest.firstName} ${guest.lastName}`, `${guest.organization}`, guest.email, accessRequestId)
       const markdown = 'Guest has arrived.'
       await host.sendWebexCard(WEBEX_ACCESS_TOKEN, markdown, approvalCard)
 
