@@ -35,12 +35,10 @@ Amplify Params - DO NOT EDIT */
 const AWS = require('aws-sdk')
 const ssm = new AWS.SSM()
 
-var express = require('express')
-var bodyParser = require('body-parser')
-var awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
+const express = require('express')
+const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 
-const fetch = require('node-fetch')
-const moment = require('moment-timezone');
+const moment = require('moment-timezone')
 
 const User = require('./utils/User');
 const Meraki = require('./utils/Meraki')
@@ -50,8 +48,8 @@ const AccessRequest = require('./utils/AccessRequest');
 const { Errors, RESTError } = require('./utils/Errors');
 
 // declare a new express app
-var app = express()
-app.use(bodyParser.json())
+const app = express()
+app.use(express.json())
 app.use(awsServerlessExpressMiddleware.eventContext())
 // Enable CORS for all methods
 app.use(function(req, res, next) {
@@ -59,16 +57,6 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "*")
   next()
 });
-
-function generatePassword() {
-  let length = 8,
-      charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-      retVal = "";
-  for (let i = 0, n = charset.length; i < length; ++i) {
-    retVal += charset.charAt(Math.floor(Math.random() * n));
-  }
-  return retVal;
-}
 
 app.post('/webhooks/webex', async function(req, res) {
 
