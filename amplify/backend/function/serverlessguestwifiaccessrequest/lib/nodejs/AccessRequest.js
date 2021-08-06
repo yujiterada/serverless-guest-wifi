@@ -1,10 +1,8 @@
 const AWS = require('aws-sdk')
 const docClient = new AWS.DynamoDB.DocumentClient()
 
-const { Errors, RESTError } = require('./Errors')
-
 class AccessRequest {
-  constructor(id, hostEmail, guestEmail) {
+  constructor(Errors, RESTError, id, hostEmail, guestEmail) {
     
     const date = new Date()
     const epoch = date.getTime()
@@ -15,6 +13,8 @@ class AccessRequest {
     this.status = 'created'
     this.createdAt = epoch
     this.modifiedAt = epoch
+    this.Errors = Errors
+    this.RESTError = RESTError
   }
 
   async queryDynamoDB() {
@@ -41,14 +41,9 @@ class AccessRequest {
       }
     } catch(err) {
       console.warn(`[AccessRequest][queryDynamoDB()] An error occurred for access request with id=${this.id} when querying DynamoDB`)
-      if (err instanceof RESTError) {
-        throw err
-      }
-      else {
-        console.warn(err)
-        // Throw error
-        throw new RESTError(Errors.InternalServerError)
-      }
+      console.warn(err)
+      // Throw error
+      throw new this.RESTError(this.Errors.InternalServerError)
     }
   }
 
@@ -74,10 +69,11 @@ class AccessRequest {
       return
     } catch (err) {
       console.warn(`[AccessRequest][commitToDynamoDB()] Failed to commit accessRequest with id=${this.id} in DynamoDB`)
+      console.warn(err)
       // Throw error
-      throw new RESTError(Errors.InternalServerError)
+      throw new this.RESTError(this.Errors.InternalServerError)
     }
   }
 }
 
-module.exports = AccessRequest
+module.exports = { AccessRequest }

@@ -66,6 +66,34 @@
       "service": "Lambda",
       "dependsOn": [
         {
+          "category": "function",
+          "resourceName": "serverlessguestwifiwebex",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "serverlessguestwifierror",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "serverlessguestwifiuser",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "serverlessguestwifiaccessrequest",
+          "attributes": [
+            "Arn"
+          ]
+        },
+        {
           "category": "storage",
           "resourceName": "accessrequest",
           "attributes": [
@@ -139,6 +167,11 @@
       "build": true
     },
     "serverlessguestwifiuser": {
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer",
+      "build": true
+    },
+    "serverlessguestwifiaccessrequest": {
       "providerPlugin": "awscloudformation",
       "service": "LambdaLayer",
       "build": true

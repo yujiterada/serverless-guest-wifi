@@ -6,7 +6,6 @@
   "dependencies": {
     "aws-sdk": "^2.879.0",
     "aws-serverless-express": "^3.3.5",
-    "body-parser": "^1.17.1",
     "express": "^4.15.2",
     "express-validator": "^6.12.0",
     "node-fetch": "^2.6.1",
