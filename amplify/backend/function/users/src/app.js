@@ -43,11 +43,11 @@ const awsServerlessExpressMiddleware = require('aws-serverless-express/middlewar
 
 const { v4: uuidv4 } = require('uuid')
 
-const User = require('./utils/User')
-const { BinaryCard } = require('./utils/Webex')
-const AccessRequest = require('./utils/AccessRequest')
-
-const { RESTError } = require('./utils/Errors')
+const { AccessRequest } = require('/opt/nodejs/AccessRequest')
+const { Webex } = require('/opt/nodejs/Webex')
+const { GuestArrivalCard } = require('/opt/nodejs/card/GuestArrivalCard')
+const { Errors, RESTError } = require('/opt/nodejs/Error')
+const { User } = require('/opt/nodejs/User')
 
 // declare a new express app
 const app = express()
@@ -99,28 +99,28 @@ app.post('/users',
      * - company (organization)
      */
 
-    const guest = new User(req.body.guestEmail)
-    const host = new User(req.body.hostEmail)
-
     try {
-      await Promise.all([guest.init(guest.email), host.init(host.email)])
+      // Obtain secrets
+      const WEBEX_ACCESS_TOKEN = await ssm.getParameters({
+        Names: ["WEBEX_ACCESS_TOKEN"].map(secretName => process.env[secretName]),
+        WithDecryption: true,
+      }).promise()
+        .then(response => response.Parameters[0].Value)
+        .catch(err => {
+          console.warn(err)
+          throw err
+        })
+
+      const webex = new Webex(WEBEX_ACCESS_TOKEN, process.env.WEBEX_BASE_URL)
+      const guest = new User(process.env, null, webex, Errors, RESTError, req.body.guestEmail)
+      const host = new User(process.env, null, webex, Errors, RESTError, req.body.hostEmail)
+
+      await Promise.all([guest.init(), host.init()])
 
       // Overwrite guest values (firstName, lastName, and organization) with new values
       guest.firstName = req.body.firstName
       guest.lastName = req.body.lastName
       guest.organization = req.body.organization
-
-      // Obtain secrets
-      const WEBEX_ACCESS_TOKEN = await ssm.getParameters({
-        Names: ["WEBEX_ACCESS_TOKEN"].map(secretName => process.env[secretName]),
-        WithDecryption: true,
-      })
-      .promise()
-      .then(response => response.Parameters[0].Value)
-      .catch(err => {
-        console.warn(err)
-        throw err
-      })
 
       // Check if Webex account exists for hostEmail if webexRoomId does not exist for user
       if (!host.webexRoomId) {
@@ -139,23 +139,13 @@ app.post('/users',
       }
 
       // Create AccessRequest
-      const accessRequest = new AccessRequest(guest.accessRequestId, host.email, guest.email)
+      const accessRequest = new AccessRequest(Errors, RESTError, guest.accessRequestId, host.email, guest.email)
       await accessRequest.queryDynamoDB()
       accessRequest.status = 'created'
+      const accessRequestId = accessRequest.id
 
       // Send approval request with Webex card
-      const title = "Guest Has Arrived"
-      const accessRequestId = accessRequest.id
-      const imageUrl = "https://developer.webex.com/images/webex-teams-logo.png"
-      const kv = {
-        Name: `${guest.firstName} ${guest.lastName}`,
-        Company: `${guest.organization}`,
-        Email: guest.email
-      }
-      const message = "Hi! Your guest has arrived and is requesting guest Wi-Fi access. Accept or decline with the following buttons."
-      const trueText = "Accept"
-      const falesText = "Decline"
-      const approvalCard = BinaryCard(title, accessRequestId, imageUrl, kv, message, trueText, falesText)
+      const approvalCard = GuestArrivalCard(`${guest.firstName} ${guest.lastName}`, `${guest.organization}`, accessRequestId)
       const markdown = 'Guest has arrived.'
       await host.sendWebexCard(WEBEX_ACCESS_TOKEN, markdown, approvalCard)
 
