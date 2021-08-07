@@ -40,12 +40,11 @@ const awsServerlessExpressMiddleware = require('aws-serverless-express/middlewar
 
 const moment = require('moment-timezone')
 
-const User = require('./utils/User');
-const Meraki = require('./utils/Meraki')
-const { Webex } = require('./utils/Webex');
-const AccessRequest = require('./utils/AccessRequest');
-
-const { Errors, RESTError } = require('./utils/Errors');
+const { AccessRequest } = require('/opt/nodejs/AccessRequest')
+const { Errors, RESTError } = require('/opt/nodejs/Error')
+const { Meraki } = require('/opt/nodejs/Meraki')
+const { User } = require('/opt/nodejs/User')
+const { Webex } = require('/opt/nodejs/Webex')
 
 // declare a new express app
 const app = express()
@@ -82,21 +81,16 @@ app.post('/webhooks/webex', async function(req, res) {
 
     // Obtain Webex Action Details
     const webex = new Webex(WEBEX_ACCESS_TOKEN, process.env.WEBEX_BASE_URL)
-    const response = await webex.getWebhookAttachmentActionDetails(actionId)
-    if (response.status === 404) {
-      console.warn(`[POST][/webhooks/webex] Could not find webhook attachment action with id=${actionId}`)
-      throw RESTError(Errors.BadRequest)
-    }
-    const action = await response.json()
+    const action = await webex.getWebhookAttachmentActionDetails(actionId)
     const accessRequestId = action.inputs.id
 
     // Fetch Access Request with ID in Action Details
-    const accessRequest = new AccessRequest(accessRequestId)
+    const accessRequest = new AccessRequest(Errors, RESTError, accessRequestId)
     await accessRequest.queryDynamoDB()
     
     // Fetch Guest and Host from the Access Request
-    const guest = new User(accessRequest.guestEmail)
-    const host = new User(accessRequest.hostEmail)
+    const guest = new User(process.env, null, webex, Errors, RESTError, accessRequest.guestEmail)
+    const host = new User(process.env, null, webex, Errors, RESTError, accessRequest.hostEmail)
     await Promise.all([guest.init(), host.init()])
 
     if (accessRequest.status === 'created') {
@@ -125,9 +119,7 @@ app.post('/webhooks/webex', async function(req, res) {
                 expiresAt: expiresAt
               }
             ]
-            const response = await meraki.updateNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.merakiAuthUserIds[0], guest.password, authorizations, emailPasswordToUser)
-            console.log(response)
-            const merakiAuthUser = await response.json()
+            const merakiAuthUser = await meraki.updateNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.merakiAuthUserIds[0], guest.password, authorizations, emailPasswordToUser)
             console.log(merakiAuthUser)
           }
           // Else, create Meraki Auth User
@@ -140,10 +132,7 @@ app.post('/webhooks/webex', async function(req, res) {
               }
             ]
             const accountType = "Guest"
-            const response = await meraki.createNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.email, `${guest.firstName} ${guest.lastName}`, guest.password, authorizations, accountType, emailPasswordToUser)
-            console.log(response)
-            const merakiAuthUser = await response.json()
-            console.log(merakiAuthUser)
+            const merakiAuthUser = await meraki.createNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.email, `${guest.firstName} ${guest.lastName}`, guest.password, authorizations, accountType, emailPasswordToUser)
             guest.merakiAuthUserIds[0] = merakiAuthUser.id
           }
 
@@ -157,9 +146,7 @@ app.post('/webhooks/webex', async function(req, res) {
                 expiresAt: expiresAt
               }
             ]
-            const response = await meraki.updateNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.merakiAuthUserIds[1], guest.password, authorizations, emailPasswordToUser)
-            console.log(response)
-            const merakiAuthUser = await response.json()
+            const merakiAuthUser = await meraki.updateNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.merakiAuthUserIds[1], guest.password, authorizations, emailPasswordToUser)
             console.log(merakiAuthUser)
           }
           // Else, create Meraki Auth User
@@ -173,9 +160,7 @@ app.post('/webhooks/webex', async function(req, res) {
               }
             ]
             const accountType = "802.1X"
-            const response = await meraki.createNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.email, `${guest.firstName} ${guest.lastName}`, guest.password, authorizations, accountType, emailPasswordToUser)
-            console.log(response)
-            const merakiAuthUser = await response.json()
+            const merakiAuthUser = await meraki.createNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.email, `${guest.firstName} ${guest.lastName}`, guest.password, authorizations, accountType, emailPasswordToUser)
             console.log(merakiAuthUser)
             guest.merakiAuthUserIds[1] = merakiAuthUser.id
           }
@@ -183,7 +168,7 @@ app.post('/webhooks/webex', async function(req, res) {
           await Promise.all([
             guest.commitToDynamoDB(),
             accessRequest.commitToDynamoDB(),
-            webex.sendText(host.email, `You have granted guest Wi-Fi access for ${guest.firstName} ${guest.lastName} (${guest.email}) for 60 minutes`)
+            host.sendWebexText(WEBEX_ACCESS_TOKEN, `You have granted guest Wi-Fi access for ${guest.firstName} ${guest.lastName} (${guest.email}) for 60 minutes`)
           ])
         }
         // Else, throw an error
@@ -199,29 +184,20 @@ app.post('/webhooks/webex', async function(req, res) {
         accessRequest.status = 'declined'
         await Promise.all([
           accessRequest.commitToDynamoDB(),
-          webex.sendText(host.email, `You have declined guest Wi-Fi access for ${guest.firstName} ${guest.lastName} (${guest.email})`)
+          host.sendWebexText(WEBEX_ACCESS_TOKEN, `You have declined guest Wi-Fi access for ${guest.firstName} ${guest.lastName} (${guest.email})`)
         ])
       }
     }
     else {
-      await webex.sendText(host.email, `You have already responded to this request`)
+      await host.sendWebexText(WEBEX_ACCESS_TOKEN, `You have already responded to this request`)
     }
   } catch(err) {
     console.warn(`[POST][/webhooks/webex] Error id=${actionId}`)
     console.warn(err)
-    if (err instanceof RESTError) {
-      return res.status(err.status).json({
-        title: err.message,
-        'invalid-params': err.invalidParams
-      })
-    }
-    else {
-      console.warn(`[POST][/webhooks/webex] ${err}`)
-      return res.status('500').json({
-        title: err.message,
-        'invalid-params': []
-      })
-    }
+    return res.status('500').json({
+      title: err.message,
+      'invalid-params': []
+    })
   }
 
   res.sendStatus(200);
