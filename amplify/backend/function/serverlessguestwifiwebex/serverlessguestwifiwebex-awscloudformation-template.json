@@ -20,7 +20,7 @@
     }
   },
   "Resources": {
-    "LambdaLayerVersionce70cc19": {
+    "LambdaLayerVersionf49647d5": {
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
         "CompatibleRuntimes": {
@@ -51,13 +51,50 @@
       "DeletionPolicy": "Delete",
       "UpdateReplacePolicy": "Retain"
     },
-    "LambdaLayerPermissionPrivatece70cc19": {
+    "LambdaLayerPermissionPrivatef49647d5": {
       "Type": "AWS::Lambda::LayerVersionPermission",
       "Properties": {
         "Action": "lambda:GetLayerVersion",
         "LayerVersionArn": {
-          "Ref": "LambdaLayerVersionce70cc19"
+          "Ref": "LambdaLayerVersionf49647d5"
         },
+        "Principal": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    },
+    "LambdaLayerVersionce70cc19": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "CompatibleRuntimes": [
+          "nodejs14.x"
+        ],
+        "Content": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersionce70cc19-build.zip"
+        },
+        "Description": "Updated layer version 2021-08-06T07:03:27.504Z",
+        "LayerName": {
+          "Fn::Sub": [
+            "serverlessguestwifiwebex-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        }
+      },
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "LambdaLayerPermissionPrivatece70cc19": {
+      "Type": "AWS::Lambda::LayerVersionPermission",
+      "Properties": {
+        "Action": "lambda:GetLayerVersion",
+        "LayerVersionArn": "arn:aws:lambda:us-west-2:107524997680:layer:serverlessguestwifiwebex-prod:2",
         "Principal": {
           "Ref": "AWS::AccountId"
         }
@@ -104,7 +141,7 @@
   "Outputs": {
     "Arn": {
       "Value": {
-        "Ref": "LambdaLayerVersionce70cc19"
+        "Ref": "LambdaLayerVersionf49647d5"
       }
     }
   }

@@ -48,6 +48,26 @@
     "storageuserStreamArn": {
       "Type": "String",
       "Default": "storageuserStreamArn"
+    },
+    "functionserverlessguestwifimerakiArn": {
+      "Type": "String",
+      "Default": "functionserverlessguestwifimerakiArn"
+    },
+    "functionserverlessguestwifiwebexArn": {
+      "Type": "String",
+      "Default": "functionserverlessguestwifiwebexArn"
+    },
+    "functionserverlessguestwifierrorArn": {
+      "Type": "String",
+      "Default": "functionserverlessguestwifierrorArn"
+    },
+    "functionserverlessguestwifiuserArn": {
+      "Type": "String",
+      "Default": "functionserverlessguestwifiuserArn"
+    },
+    "functionserverlessguestwifiaccessrequestArn": {
+      "Type": "String",
+      "Default": "functionserverlessguestwifiaccessrequestArn"
     }
   },
   "Conditions": {
@@ -179,7 +199,23 @@
           ]
         },
         "Runtime": "nodejs14.x",
-        "Layers": [],
+        "Layers": [
+          {
+            "Ref": "functionserverlessguestwifimerakiArn"
+          },
+          {
+            "Ref": "functionserverlessguestwifiwebexArn"
+          },
+          {
+            "Ref": "functionserverlessguestwifierrorArn"
+          },
+          {
+            "Ref": "functionserverlessguestwifiuserArn"
+          },
+          {
+            "Ref": "functionserverlessguestwifiaccessrequestArn"
+          }
+        ],
         "Timeout": "25"
       }
     },

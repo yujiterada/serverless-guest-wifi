@@ -23,20 +23,16 @@
     "LambdaLayerVersion1881f197": {
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
-        "CompatibleRuntimes": {
-          "Ref": "runtimes"
-        },
+        "CompatibleRuntimes": [
+          "nodejs14.x"
+        ],
         "Content": {
           "S3Bucket": {
             "Ref": "deploymentBucketName"
           },
-          "S3Key": {
-            "Ref": "s3Key"
-          }
+          "S3Key": "amplify-builds/serverlessguestwifiuser-LambdaLayerVersion1881f197-build.zip"
         },
-        "Description": {
-          "Ref": "description"
-        },
+        "Description": "Updated layer version 2021-08-06T07:03:27.504Z",
         "LayerName": {
           "Fn::Sub": [
             "serverlessguestwifiuser-${env}",
@@ -55,9 +51,7 @@
       "Type": "AWS::Lambda::LayerVersionPermission",
       "Properties": {
         "Action": "lambda:GetLayerVersion",
-        "LayerVersionArn": {
-          "Ref": "LambdaLayerVersion1881f197"
-        },
+        "LayerVersionArn": "arn:aws:lambda:us-west-2:107524997680:layer:serverlessguestwifiuser-prod:2",
         "Principal": {
           "Ref": "AWS::AccountId"
         }

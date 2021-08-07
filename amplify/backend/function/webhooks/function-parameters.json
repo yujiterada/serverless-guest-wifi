@@ -1,5 +1,41 @@
 {
-  "lambdaLayers": [],
+  "lambdaLayers": [
+    {
+      "type": "ProjectLayer",
+      "resourceName": "serverlessguestwifimeraki",
+      "env": "prod",
+      "version": "Always choose latest version",
+      "isLatestVersionSelected": true
+    },
+    {
+      "type": "ProjectLayer",
+      "resourceName": "serverlessguestwifiwebex",
+      "env": "prod",
+      "version": "Always choose latest version",
+      "isLatestVersionSelected": true
+    },
+    {
+      "type": "ProjectLayer",
+      "resourceName": "serverlessguestwifierror",
+      "env": "prod",
+      "version": "Always choose latest version",
+      "isLatestVersionSelected": true
+    },
+    {
+      "type": "ProjectLayer",
+      "resourceName": "serverlessguestwifiuser",
+      "env": "prod",
+      "version": "Always choose latest version",
+      "isLatestVersionSelected": true
+    },
+    {
+      "type": "ProjectLayer",
+      "resourceName": "serverlessguestwifiaccessrequest",
+      "env": "prod",
+      "version": "Always choose latest version",
+      "isLatestVersionSelected": true
+    }
+  ],
   "environmentVariableList": [
     {
       "cloudFormationParameterName": "merakiBaseUrl",
