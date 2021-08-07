@@ -35,11 +35,11 @@
         },
         "serverlessguestwifimeraki": {
           "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
-          "s3Key": "amplify-builds/serverlessguestwifimeraki-LambdaLayerVersiond9711711-build.zip"
+          "s3Key": "amplify-builds/serverlessguestwifimeraki-LambdaLayerVersion6213fbdf-build.zip"
         },
         "serverlessguestwifiwebex": {
           "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
-          "s3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersiondf6caeaa-build.zip"
+          "s3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersionae62a0da-build.zip"
         },
         "serverlessguestwifierror": {
           "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
