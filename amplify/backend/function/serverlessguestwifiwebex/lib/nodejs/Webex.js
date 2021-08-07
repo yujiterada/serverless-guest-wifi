@@ -140,6 +140,17 @@ class Webex {
     }
     return await this.call(path, options)
   }
+
+  async getWebhookAttachmentActionDetails(actionId) {
+    this.logging && console.log(`[Webex][createWebhook] Try to get webhook attachment action details with id=${actionId}`)
+    const path = `/attachment/actions/${actionId}`
+    const options = {
+      method: 'GET',
+      headers: this.headers
+    }
+    return await this.call(path, options)
+
+  }
 }
 
 module.exports = { APIError, Webex }
