@@ -188,10 +188,10 @@ class Meraki {
   }
 
   async updateNetworkMerakiAuthUser(networkId, merakiAuthUserId, password, authorizations, emailPasswordToUser) {
-    this.logging && console.log(`[Meraki][createNetworkMerakiAuthUser] networkId=${networkId} authorizations=${authorizations} emailPasswordToUser=${emailPasswordToUser}`)
+    this.logging && console.log(`[Meraki][updateNetworkMerakiAuthUser] networkId=${networkId} merakiAuthUserId=${merakiAuthUserId} authorizations=${authorizations} emailPasswordToUser=${emailPasswordToUser}`)
     const path = `/networks/${networkId}/merakiAuthUsers/${merakiAuthUserId}`
     const options = {
-      method: 'POST',
+      method: 'PUT',
       headers: this.headers,
       body: JSON.stringify({
         password: password,
