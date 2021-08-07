@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Guest Wi-Fi Demo App",
+  "name": "Create Guest Wi-Fi Demo App Sample",
   "icons": [
     {
       "src": "favicon.ico",
