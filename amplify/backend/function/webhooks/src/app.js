@@ -61,6 +61,15 @@ app.post('/webhooks/webex', async function(req, res) {
 
   // Obtain Webex Action ID
   const actionId = req.body.data.id
+  const ssids = [0, 1]
+  const ssidConfiguration = {
+    0: {
+      accountType: 'Guest'
+    },
+    1: {
+      accountType: '802.1X'
+    }
+  }
 
   try {
     // Obtain secrets for Webex
@@ -109,61 +118,35 @@ app.post('/webhooks/webex', async function(req, res) {
           console.log(`[POST][/webhooks/webex] expiresAt=${expiresAt}`)
           const emailPasswordToUser = "true"
 
-          // Check if Meraki Auth User ID already exists for SSID 0 (splash)
-          // If it does, update Meraki Auth User
-          if (guest.merakiAuthUserIds[0]) {
-            console.log(`[POST][/webhooks/webex] Updating Meraki Auth User for SSID 0`)
-            const authorizations = [
-              {
-                ssidNumber: "0",
-                expiresAt: expiresAt
-              }
-            ]
-            const merakiAuthUser = await meraki.updateNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.merakiAuthUserIds[0], guest.password, authorizations, emailPasswordToUser)
-            console.log(merakiAuthUser)
-          }
-          // Else, create Meraki Auth User
-          else {
-            console.log(`[POST][/webhooks/webex] Creating Meraki Auth User for SSID 0`)
-            const authorizations = [
-              {
-                ssidNumber: "0",
-                expiresAt: expiresAt
-              }
-            ]
-            const accountType = "Guest"
-            const merakiAuthUser = await meraki.createNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.email, `${guest.firstName} ${guest.lastName}`, guest.password, authorizations, accountType, emailPasswordToUser)
-            guest.merakiAuthUserIds[0] = merakiAuthUser.id
+          for (const ssid of ssids) {
+            // Check if Meraki Auth User ID already exists for SSID.
+            // If it does, update Meraki Auth User
+            if (guest.merakiAuthUserIds[ssid]) {
+              console.log(`[POST][/webhooks/webex] Updating Meraki Auth User for SSID ${ssid}`)
+              const authorizations = [
+                {
+                  ssidNumber: `${ssid}`,
+                  expiresAt: expiresAt
+                }
+              ]
+              const merakiAuthUser = await meraki.updateNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.merakiAuthUserIds[ssid], guest.password, authorizations, emailPasswordToUser)
+              console.log(merakiAuthUser)
+            }
+            // Else, create Meraki Auth User
+            else {
+              console.log(`[POST][/webhooks/webex] Creating Meraki Auth User for SSID ${ssid}`)
+              const authorizations = [
+                {
+                  ssidNumber: `${ssid}`,
+                  expiresAt: expiresAt
+                }
+              ]
+              const accountType = ssidConfiguration[ssid].accountType
+              const merakiAuthUser = await meraki.createNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.email, `${guest.firstName} ${guest.lastName}`, guest.password, authorizations, accountType, emailPasswordToUser)
+              guest.merakiAuthUserIds[ssid] = merakiAuthUser.id
+            }
           }
 
-          // Check if Meraki Auth User ID already exists for SSID 0 (802.1X)
-          // If it does, update Meraki Auth User
-          if (guest.merakiAuthUserIds[1]) {
-            console.log(`[POST][/webhooks/webex] Updating Meraki Auth User for SSID 1`)
-            const authorizations = [
-              {
-                ssidNumber: "1",
-                expiresAt: expiresAt
-              }
-            ]
-            const merakiAuthUser = await meraki.updateNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.merakiAuthUserIds[1], guest.password, authorizations, emailPasswordToUser)
-            console.log(merakiAuthUser)
-          }
-          // Else, create Meraki Auth User
-          else {
-            // Create Meraki Auth User
-            console.log(`[POST][/webhooks/webex] Creating Meraki Auth User for SSID 1`)
-            const authorizations = [
-              {
-                ssidNumber: "1",
-                expiresAt: expiresAt
-              }
-            ]
-            const accountType = "802.1X"
-            const merakiAuthUser = await meraki.createNetworkMerakiAuthUser(process.env.MERAKI_NETWORK_ID, guest.email, `${guest.firstName} ${guest.lastName}`, guest.password, authorizations, accountType, emailPasswordToUser)
-            console.log(merakiAuthUser)
-            guest.merakiAuthUserIds[1] = merakiAuthUser.id
-          }
           accessRequest.status = 'accepted'
           await Promise.all([
             guest.commitToDynamoDB(),

@@ -28,7 +28,7 @@
         },
         "webhooks": {
           "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
-          "s3Key": "amplify-builds/webhooks-6d4a64375a7443574352-build.zip",
+          "s3Key": "amplify-builds/webhooks-68345364347446422f73-build.zip",
           "merakiBaseUrl": "https://api.meraki.com/api/v1",
           "merakiNetworkId": "N_698057942242497683",
           "webexBaseUrl": "https://webexapis.com/v1"
