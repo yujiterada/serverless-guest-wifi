@@ -52,6 +52,11 @@ describe('Meraki.js tests', () => {
       const response = await meraki.claimIntoOrganization(merakiOrganizationId, [serial])
       assert.deepStrictEqual(response, { orders: [], serials: [ serial ], licenses: [] })
     }).timeout(10000)
+    // Claim already claimed valid serial into org
+    it(`should return "{ orders: [], serials: [ '${serial}' ], licenses: [] }"`, async () => {
+      const response = await meraki.claimIntoOrganization(merakiOrganizationId, [serial])
+      assert.deepStrictEqual(response, { orders: [], serials: [ serial ], licenses: [] })
+    }).timeout(10000)
     // Claim invalid serial into org
     it(`should return error.status=400, error.message="Device with serial '${serial}' not found"`, async () => {
       try {
@@ -65,6 +70,16 @@ describe('Meraki.js tests', () => {
     it('should return {}', async () => {
       const response = await meraki.claimNetworkDevices(merakiNetworkId, [serial])
       assert.deepStrictEqual(response, {})
+    }).timeout(10000)
+    // Claim serial that is already added to network into org
+    it(`should return error.status=400, error.message="Device with serial '${serial}' not found"`, async () => {
+      try {
+        const response = await meraki.claimIntoOrganization(merakiOrganizationId, [serial])
+        console.log(response)
+      } catch(error) {
+        assert.strictEqual(error.status, 400)
+        assert.strictEqual(error.message, `Device with serial '${serial}' is already claimed`)
+      }
     }).timeout(10000)
     // Check claimed serial
     it(`should return ${serial}`, async () => {

@@ -124,6 +124,7 @@ app.post('/devices',
           .promise()
           .then(response => response.Parameters[0].Value)
       ])
+      let promises = []
 
       const meraki = new Meraki(MERAKI_API_KEY, process.env.MERAKI_BASE_URL)
       const webex = new Webex(WEBEX_ACCESS_TOKEN, process.env.WEBEX_BASE_URL)
@@ -131,22 +132,9 @@ app.post('/devices',
       const user = new User(process.env, meraki, webex, Errors, RESTError, req.body.email)
 
       await Promise.all([device.init(), user.init()])
-      // If there is a data mismatch between DynamoDB and Meraki Network,
-      // then throw error
+      // If there is a data mismatch between DynamoDB and Meraki Network, then log error
       if (device.hasDataConflict) {
         console.warn("Data conflict between DynamoDB and Meraki Dashboard")
-        throw new RESTError(Errors.InternalServerError)
-      }
-      // If the device already exists in DynamoDB, then throw error
-      else if (device.existsInMerakiNetwork) {
-        console.warn("Device is already in DynamoDB")
-        throw new RESTError({
-          ...Errors.BadRequest,
-          message: 'Serial is already in use.'
-        }, [{
-          param: 'serial',
-          msg: 'Invalid serial number'
-        }])
       }
 
       // If user does not exist in DynamoDB,
@@ -154,17 +142,23 @@ app.post('/devices',
       if (!user.webexRoomId) {
         await user.sendWebexWelcomeText(WEBEX_ACCESS_TOKEN)
       }
-      user.devices.push(req.body.serial)
+      if (!req.body.serial in user.devices) {
+        user.devices.push(req.body.serial)
+      }
+      promises.push(user.commitToDynamoDB())
 
       // Add to Meraki organization
-      await device.addToMerakiInventory()
+      if (!device.existsInMerakiNetwork) {
+        if (!device.existsInMerakiInventory) {
+          await device.addToMerakiInventory()
+        }
+        promises.push(device.addToMerakiNetwork())
+        promises.push(user.sendWebexText(WEBEX_ACCESS_TOKEN, `${req.body.serial} added to Guest Wi-Fi Demo App.`))
+        promises.push(device.commitToDynamoDB())
+      }
 
       // Add to Meraki Network, commmit changes to DynamoDB and send text
-      await Promise.all([
-        device.addToMerakiNetwork(),
-        device.commitToDynamoDB(),
-        user.commitToDynamoDB(),
-        user.sendWebexText(WEBEX_ACCESS_TOKEN, `${req.body.serial} added to Guest Wi-Fi Demo App.`)])
+      await Promise.all(promises)
     } catch(err) {
       if (err instanceof RESTError) {
         return res.status(err.status).json({
