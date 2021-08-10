@@ -107,29 +107,17 @@ class CheckIn extends Component {
       }))
     } catch (error) {
       console.log(error)
-      if ('status' in error.response) {
-        if (error.response.status === 400 || error.response.status === 404) {
-          const errors = error.response.data
-          console.log(errors)
-          this.setState((previousState) => ({
-            ...previousState,
-            result: 'failure',
-            error: {
-              title: errors.title,
-              'invalid-params': errors['invalid-params']
-            }
-          }))
-        }
-        else {
-          this.setState((previousState) => ({
-            ...previousState,
-            result: 'failure',
-            error: {
-              title: 'An internal server error occurred. Please contact the administrator.',
-              'invalid-params': []
-            }
-          }))
-        }
+      if (error.response.status === 400 || error.response.status === 422 || error.response.status === 404) {
+        const errors = error.response.data
+        console.log(errors)
+        this.setState((previousState) => ({
+          ...previousState,
+          result: 'failure',
+          error: {
+            title: errors.title,
+            'invalid-params': errors['invalid-params']
+          }
+        }))
       }
       else {
         this.setState((previousState) => ({

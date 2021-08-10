@@ -158,7 +158,7 @@ class Management extends Component {
               }
             }))
           }
-          else if (error.response.status >= 500 && error.response.status <= 599) {
+          else {
             this.setState((previousState) => ({
               ...previousState,
               result: 'failure',
