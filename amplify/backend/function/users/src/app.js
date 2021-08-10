@@ -64,11 +64,11 @@ app.use(function(req, res, next) {
 app.post('/users',
   [
     check('firstName')
-      .isString()
+      .isString().isAlpha()
       .not().isEmpty().trim().escape()
       .withMessage("Invalid input for first name."),
     check('lastName')
-      .isString()
+      .isString().isAlpha()
       .not().isEmpty().trim().escape()
       .withMessage("Invalid input for last name."),
     check('guestEmail')
