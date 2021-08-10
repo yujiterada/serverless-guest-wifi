@@ -91,7 +91,9 @@ app.post('/webhooks/webex', async function(req, res) {
     // Obtain Webex Action Details
     const webex = new Webex(WEBEX_ACCESS_TOKEN, process.env.WEBEX_BASE_URL)
     const action = await webex.getWebhookAttachmentActionDetails(actionId)
+    console.log(action)
     const accessRequestId = action.inputs.id
+    const duration = action.inputs.duration
 
     // Fetch Access Request with ID in Action Details
     const accessRequest = new AccessRequest(Errors, RESTError, accessRequestId)
@@ -114,7 +116,7 @@ app.post('/webhooks/webex', async function(req, res) {
           console.log(`[POST][/webhooks/webex] Access request ID and room ID match`)
           
           const meraki = new Meraki(MERAKI_API_KEY, process.env.MERAKI_BASE_URL)
-          const expiresAt = moment().tz("Australia/Sydney").add(60, 'minutes').toISOString()
+          const expiresAt = moment().tz("Australia/Sydney").add(parseInt(duration), 'minutes').toISOString()
           console.log(`[POST][/webhooks/webex] expiresAt=${expiresAt}`)
           const emailPasswordToUser = "true"
 
@@ -151,7 +153,7 @@ app.post('/webhooks/webex', async function(req, res) {
           await Promise.all([
             guest.commitToDynamoDB(),
             accessRequest.commitToDynamoDB(),
-            host.sendWebexText(WEBEX_ACCESS_TOKEN, `You have granted guest Wi-Fi access for ${guest.firstName} ${guest.lastName} (${guest.email}) for 60 minutes`)
+            host.sendWebexText(WEBEX_ACCESS_TOKEN, `You have granted guest Wi-Fi access for ${guest.firstName} ${guest.lastName} (${guest.email}) for ${duration} minutes`)
           ])
         }
         // Else, throw an error

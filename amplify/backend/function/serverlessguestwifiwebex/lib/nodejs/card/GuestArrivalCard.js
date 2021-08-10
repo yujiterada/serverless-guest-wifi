@@ -99,8 +99,36 @@ function GuestArrivalCard(fullName, organization, email, accessRequestId, imageU
         },
         {
           "type": "TextBlock",
-          "text": "Hi! Your guest has arrived and is requesting guest Wi-Fi access. Accept or decline with the following buttons.",
+          "text": "Hi! Your guest has arrived and is requesting guest Wi-Fi access.",
           "wrap": true
+        },
+        {
+            "type": "TextBlock",
+            "text": "Accept or decline Wi-Fi access with the following selection and buttons.",
+            "wrap": true
+        },
+        {
+          "type": "Input.ChoiceSet",
+          "id": "duration",
+          "value": "30",
+          "choices": [
+            {
+                "title": "30 minutes",
+                "value": "30"
+            },
+            {
+                "title": "1 hour",
+                "value": "60"
+            },
+            {
+                "title": "3 hours",
+                "value": "180"
+            },
+            {
+                "title": "1 day",
+                "value": "1440"
+            }
+          ]
         },
         {
           "type": "ActionSet",
