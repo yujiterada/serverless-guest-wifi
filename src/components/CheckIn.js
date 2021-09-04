@@ -13,12 +13,14 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+
+import AddAPhotoOutlinedIcon from '@material-ui/icons/AddAPhotoOutlined';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 const styles = (theme) => ({
   paper: {
@@ -31,12 +33,23 @@ const styles = (theme) => ({
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
   },
+  photoIcon: {
+    margin: theme.spacing(1),
+    fontSize: 40,
+    color: "rgba(0, 0, 0, 0.54)"
+  },
   form: {
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(3),
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
+  },
+  boxCamera: {
+    borderRadius: '4px',
+    width: '100%',
+    minHeight: '120px',
+    backgroundColor: 'transparent'
   },
   formSection: {
     textAlign: 'left'
@@ -48,6 +61,11 @@ const styles = (theme) => ({
     left: '50%',
     marginTop: -12,
     marginLeft: -12,
+  },
+  largeAvatar: {
+    margin: theme.spacing(1),
+    width: theme.spacing(10),
+    height: theme.spacing(10)
   },
 });
 
@@ -69,7 +87,8 @@ class CheckIn extends Component {
       title: '',
       'invalid-params': []
     },
-    open: false
+    open: false,
+    photo: null
   }
 
   handleSubmit = async (e) => {
@@ -146,18 +165,31 @@ class CheckIn extends Component {
     }))
   }
 
-  handleClose = (event) => {
+  handleClose = (e) => {
     this.setState((previousState) => ({
       ...previousState,
       open: false
     }))
   };
 
+  cameraInput = React.createRef()
+  focusCameraInput = () => this.cameraInput.current.click()
+
+  handleCameraInputChange = (e) => {
+    e.preventDefault()
+    const fileUploaded = e.target.files[0]
+    this.setState((previousState) => ({
+      ...previousState,
+      photo: URL.createObjectURL(fileUploaded)
+    }))
+  }
+
   render() {
 
     const { classes } = this.props;
-    const { firstName, lastName, organization, guestEmail, hostEmail, loading, result, error, open } = this.state;
+    const { firstName, lastName, organization, guestEmail, hostEmail, loading, result, error, open, photo } = this.state
     const invalidParams = new Map(error['invalid-params'].map(obj => [obj.param, obj.msg]))
+    const smartphone = /iPad|iPhone|iPod|Android/.test(navigator.userAgent) && !window.MSStream
 
     return (
       <Container component="main" maxWidth="xs">
@@ -249,6 +281,37 @@ class CheckIn extends Component {
                   }}
                 />
               </Grid>
+              { smartphone && (
+                <Grid item xs={12} style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'}}
+                >
+                  <Box
+                    borderColor={"rgba(0, 0, 0, 0.23)"}
+                    variant="contained"
+                    color="primary"
+                    disableElevation
+                    className={classes.boxCamera}
+                    onClick={this.focusCameraInput}
+                  >
+                    <input accept="image/*" id="icon-button-file" type="file" capture="user" ref={this.cameraInput} style={{display: 'none'}} onChange={ this.handleCameraInputChange }/>
+                    <Typography style={{
+                      color: "rgba(0, 0, 0, 0.54)",
+                      textAlign: 'left',
+                      paddingTop: '18.5px',
+                      paddingLeft: '14px'}}>
+                      Photo
+                    </Typography>
+                    { photo === null && (
+                      <AddAPhotoOutlinedIcon className={classes.photoIcon}/>
+                    )}
+                    { photo !== null && (
+                      <Avatar alt="Your photo" src={photo} className={classes.largeAvatar} style={{display: 'inline-flex'}}/>
+                    )}
+                  </Box>
+                </Grid>
+              )}
             </Grid>
             <Grid container spacing={2}>
               <Grid item xs={12}>
