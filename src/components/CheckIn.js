@@ -4,6 +4,7 @@ import { compose } from 'redux'
 
 import { API } from 'aws-amplify'
 
+import Camera from './Camera'
 import Copyright from './Copyright';
 
 import Avatar from '@material-ui/core/Avatar';
@@ -76,19 +77,67 @@ function Alert(props) {
 class CheckIn extends Component {
   
   state = {
-    firstName: '',
-    lastName: '',
-    organization: '',
-    guestEmail: '',
-    hostEmail: '',
-    loading: false,
-    result: '',
     error: {
       title: '',
       'invalid-params': []
     },
-    open: false,
-    photo: null
+    firstName: '',
+    guestEmail: '',
+    hostEmail: '',
+    isCameraView: false,
+    isErrorOpen: false,
+    lastName: '',
+    loading: false,
+    organization: '',
+    result: '',
+    uri: null,
+  }
+
+  cameraInput = React.createRef()
+  focusCameraInput = () => this.cameraInput.current.click()
+
+  closeCamera = () => {
+    this.setState((previousState) => ({
+      ...previousState,
+      isCameraView: false
+    }))
+  }
+
+  updateUri = (uri) => {
+    this.setState((previousState) => ({
+      ...previousState,
+      uri: uri
+    }))
+  }
+
+  handleCameraInputChange = (e) => {
+    e.preventDefault()
+    const fileUploaded = e.target.files[0]
+    this.updateUri(URL.createObjectURL(fileUploaded))
+  }
+
+  handleCloseError = (e) => {
+    this.setState((previousState) => ({
+      ...previousState,
+      open: false
+    }))
+  }
+
+  handleChange = (e) => {
+    e.preventDefault()
+
+    this.setState(() => ({
+      [e.target.name]: e.target.value,
+    }))
+  }
+
+  handleOpenCamera = (e) => {
+    e.preventDefault()
+
+    this.setState((previousState) => ({
+      ...previousState,
+      isCameraView: true
+    }))
   }
 
   handleSubmit = async (e) => {
@@ -157,131 +206,112 @@ class CheckIn extends Component {
     }))
   }
 
-  handleChange = (e) => {
-    e.preventDefault()
-
-    this.setState(() => ({
-      [e.target.name]: e.target.value,
-    }))
-  }
-
-  handleClose = (e) => {
-    this.setState((previousState) => ({
-      ...previousState,
-      open: false
-    }))
-  };
-
-  cameraInput = React.createRef()
-  focusCameraInput = () => this.cameraInput.current.click()
-
-  handleCameraInputChange = (e) => {
-    e.preventDefault()
-    const fileUploaded = e.target.files[0]
-    this.setState((previousState) => ({
-      ...previousState,
-      photo: URL.createObjectURL(fileUploaded)
-    }))
-  }
-
   render() {
 
     const { classes } = this.props;
-    const { firstName, lastName, organization, guestEmail, hostEmail, loading, result, error, open, photo } = this.state
+    const { firstName, lastName, organization, guestEmail, hostEmail, loading, result, error, isErrorOpen, uri, isCameraView } = this.state
     const invalidParams = new Map(error['invalid-params'].map(obj => [obj.param, obj.msg]))
     const smartphone = /iPad|iPhone|iPod|Android/.test(navigator.userAgent) && !window.MSStream
 
-    return (
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Check In
-          </Typography>
-          <form className={classes.form} onSubmit={this.handleSubmit} noValidate autoComplete="off">
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Typography variant="h6" gutterBottom className={classes.formSection}>
-                  Guest
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  helperText={invalidParams.has('firstName') ? invalidParams.get('firstName') : ''}
-                  disabled={loading}
-                  error={invalidParams.has('firstName')}
-                  value={firstName}
-                  onChange={this.handleChange}
-                  name="firstName"
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                  InputProps={{
-                    readOnly: loading
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  helperText={invalidParams.has('lastName') ? invalidParams.get('lastName') : ''}
-                  disabled={loading}
-                  error={invalidParams.has('lastName')}
-                  value={lastName}
-                  onChange={this.handleChange}
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  InputProps={{
-                    readOnly: loading,
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  helperText={invalidParams.has('guestEmail') ? invalidParams.get('guestEmail') : ''}
-                  disabled={loading}
-                  error={invalidParams.has('guestEmail')}
-                  value={guestEmail}
-                  onChange={this.handleChange}
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="guestEmail"
-                  label="Email Address"
-                  name="guestEmail"
-                  InputProps={{
-                    readOnly: loading,
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  helperText={invalidParams.has('organization') ? invalidParams.get('organization') : ''}
-                  disabled={loading}
-                  error={invalidParams.has('organization')}
-                  value={organization}
-                  onChange={this.handleChange}
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="organization"
-                  label="Organization"
-                  name="organization"
-                  InputProps={{
-                    readOnly: loading,
-                  }}
-                />
-              </Grid>
-              { smartphone && (
+    if (isCameraView) {
+      return (
+        <Camera
+          closeCamera={this.closeCamera}
+          updateUri={this.updateUri}
+        />
+      )
+    }
+    else {
+      return (
+        <Container component="main" maxWidth="xs">
+          <CssBaseline />
+          <div className={classes.paper}>
+            <Avatar className={classes.avatar}>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5">
+              Check In
+            </Typography>
+            <form className={classes.form} onSubmit={this.handleSubmit} noValidate autoComplete="off">
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Typography variant="h6" gutterBottom className={classes.formSection}>
+                    Guest
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    helperText={invalidParams.has('firstName') ? invalidParams.get('firstName') : ''}
+                    disabled={loading}
+                    error={invalidParams.has('firstName')}
+                    value={firstName}
+                    onChange={this.handleChange}
+                    name="firstName"
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="firstName"
+                    label="First Name"
+                    autoFocus
+                    InputProps={{
+                      readOnly: loading
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    helperText={invalidParams.has('lastName') ? invalidParams.get('lastName') : ''}
+                    disabled={loading}
+                    error={invalidParams.has('lastName')}
+                    value={lastName}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="lastName"
+                    label="Last Name"
+                    name="lastName"
+                    InputProps={{
+                      readOnly: loading,
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    helperText={invalidParams.has('guestEmail') ? invalidParams.get('guestEmail') : ''}
+                    disabled={loading}
+                    error={invalidParams.has('guestEmail')}
+                    value={guestEmail}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="guestEmail"
+                    label="Email Address"
+                    name="guestEmail"
+                    InputProps={{
+                      readOnly: loading,
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    helperText={invalidParams.has('organization') ? invalidParams.get('organization') : ''}
+                    disabled={loading}
+                    error={invalidParams.has('organization')}
+                    value={organization}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="organization"
+                    label="Organization"
+                    name="organization"
+                    InputProps={{
+                      readOnly: loading,
+                    }}
+                  />
+                </Grid>
                 <Grid item xs={12} style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -291,9 +321,7 @@ class CheckIn extends Component {
                     borderColor={"rgba(0, 0, 0, 0.23)"}
                     variant="contained"
                     color="primary"
-                    disableElevation
                     className={classes.boxCamera}
-                    onClick={this.focusCameraInput}
                   >
                     <input accept="image/*" id="icon-button-file" type="file" capture="user" ref={this.cameraInput} style={{display: 'none'}} onChange={ this.handleCameraInputChange }/>
                     <Typography style={{
@@ -303,73 +331,73 @@ class CheckIn extends Component {
                       paddingLeft: '14px'}}>
                       Photo
                     </Typography>
-                    { photo === null && (
-                      <AddAPhotoOutlinedIcon className={classes.photoIcon}/>
+                    { uri === null && (
+                      <AddAPhotoOutlinedIcon className={classes.photoIcon} onClick={smartphone ? this.focusCameraInput : this.handleOpenCamera}/>
                     )}
-                    { photo !== null && (
-                      <Avatar alt="Your photo" src={photo} className={classes.largeAvatar} style={{display: 'inline-flex'}}/>
+                    { uri !== null && (
+                      <Avatar alt="Your photo" src={uri} className={classes.largeAvatar} style={{display: 'inline-flex'}} onClick={smartphone ? this.focusCameraInput : this.handleOpenCamera}/>
                     )}
                   </Box>
                 </Grid>
-              )}
-            </Grid>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Typography variant="h6" gutterBottom className={classes.formSection}>
-                  Host
-                </Typography>
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  helperText={invalidParams.has('hostEmail') ? invalidParams.get('hostEmail') : ''}
-                  disabled={loading}
-                  error={invalidParams.has('hostEmail')}
-                  value={hostEmail}
-                  onChange={this.handleChange}
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="hostEmail"
-                  label="Email Address"
-                  name="hostEmail"
-                  InputProps={{
-                    readOnly: loading,
-                  }}
-                />
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Typography variant="h6" gutterBottom className={classes.formSection}>
+                    Host
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    helperText={invalidParams.has('hostEmail') ? invalidParams.get('hostEmail') : ''}
+                    disabled={loading}
+                    error={invalidParams.has('hostEmail')}
+                    value={hostEmail}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="hostEmail"
+                    label="Email Address"
+                    name="hostEmail"
+                    InputProps={{
+                      readOnly: loading,
+                    }}
+                  />
+                </Grid>
               </Grid>
-            </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              disabled={loading || firstName.length <= 0 || lastName.length <= 0 || organization.length <= 0 || guestEmail.length <= 0 || hostEmail.length <= 0}
-            >
-              Check In
-              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
-            </Button>
-          </form>
-        </div>
-        <Box mt={5}>
-          <Copyright />
-        </Box>
-        { result === 'failure' && (
-          <Snackbar open={open} onClose={this.handleClose}>
-            <Alert onClose={this.handleClose} severity="error">
-              { error.title }
-            </Alert>
-          </Snackbar>
-        )}
-        { result === 'success' && (
-          <Snackbar open={open} autoHideDuration={6000} onClose={this.handleClose}>
-            <Alert onClose={this.handleClose} severity="success">
-              Success!
-            </Alert>
-          </Snackbar>
-        )}
-      </Container>
-    )
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                disabled={loading || firstName.length <= 0 || lastName.length <= 0 || organization.length <= 0 || guestEmail.length <= 0 || hostEmail.length <= 0}
+              >
+                Check In
+                {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              </Button>
+            </form>
+          </div>
+          <Box mt={5}>
+            <Copyright />
+          </Box>
+          { result === 'failure' && (
+            <Snackbar open={isErrorOpen} onClose={this.handleCloseError}>
+              <Alert onClose={this.handleCloseError} severity="error">
+                { error.title }
+              </Alert>
+            </Snackbar>
+          )}
+          { result === 'success' && (
+            <Snackbar open={isErrorOpen} autoHideDuration={6000} onClose={this.handleCloseError}>
+              <Alert onClose={this.handleCloseError} severity="success">
+                Success!
+              </Alert>
+            </Snackbar>
+          )}
+        </Container>
+      )
+    }
   }
 }
 
