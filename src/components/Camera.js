@@ -100,7 +100,19 @@ class Camera extends Component {
     console.log('screen', window.screen.height, window.screen.width)
     console.log('window', wHeight, wWidth)
 
-    if (wHeight/cHeight >= wWidth/cWidth) {
+    if (cHeight < wHeight || cWidth < wWidth) {
+      console.log('Using a camera with low resolution')
+      this.setState((previousState) => ({
+        ...previousState,
+        cameraViewStyle: {
+          marginLeft: 0,
+          marginTop: 0,
+          maxHeight: '100vh',
+          maxWidth: 'none'
+        }
+      }))
+    }
+    else if (wHeight/cHeight >= wWidth/cWidth) {
       console.log('white space on top/bottom, change maxWidth to none, maxHeight to 100vh, need to adjust left')
       this.setState((previousState) => ({
         ...previousState,
@@ -166,6 +178,7 @@ class Camera extends Component {
           maxHeight: maxHeight,
           maxWidth: maxWidth,
           zIndex: -1,
+          objectFit: 'cover'
         }}></Grid>
         <Fab color="primary" aria-label="add" className={classes.fabPhoto} onClick={() => this.handleTakePhoto()}>
           <CameraIcon fontSize="large"/>
