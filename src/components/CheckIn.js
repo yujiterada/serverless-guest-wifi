@@ -23,6 +23,14 @@ import MuiAlert from '@material-ui/lab/Alert';
 import AddAPhotoOutlinedIcon from '@material-ui/icons/AddAPhotoOutlined';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
+import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detection'
+// BLAZEFACE: import * as blazeface from '@tensorflow-models/blazeface';
+import * as tf from '@tensorflow/tfjs-core';
+import * as tfjsWasm from '@tensorflow/tfjs-backend-wasm';
+
+tfjsWasm.setWasmPaths(
+  `https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${tfjsWasm.version_wasm}/dist/`)
+
 const styles = (theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -86,6 +94,7 @@ class CheckIn extends Component {
     hostEmail: '',
     isCameraView: false,
     isErrorOpen: false,
+    isFace: null,
     lastName: '',
     loading: false,
     organization: '',
@@ -100,13 +109,6 @@ class CheckIn extends Component {
     this.setState((previousState) => ({
       ...previousState,
       isCameraView: false
-    }))
-  }
-
-  updateUri = (uri) => {
-    this.setState((previousState) => ({
-      ...previousState,
-      uri: uri
     }))
   }
 
@@ -149,45 +151,64 @@ class CheckIn extends Component {
     }))
 
     try {
+      // Create body to POST
       const data = {
         body: {
+          photo: this.state.isFace ? this.state.uri : null,
           firstName: this.state.firstName,
-          lastName: this.state.lastName,
-          organization: this.state.organization,
           guestEmail: this.state.guestEmail,
           hostEmail: this.state.hostEmail,
+          lastName: this.state.lastName,
+          organization: this.state.organization,
         }
       }
+      // Send data
       await API.post('users', '/users', data)
+      // Reset state
       this.setState((previousState) => ({
         ...previousState,
-        firstName: '',
-        lastName: '',
-        organization: '',
-        guestEmail: '',
-        hostEmail: '',
-        loading: false,
-        result: 'success',
         error: {
           title: '',
           'invalid-params': []
         },
+        firstName: '',
+        guestEmail: '',
+        hostEmail: '',
+        isFace: null,
+        lastName: '',
+        loading: false,
+        organization: '',
+        result: 'success',
+        uri: null,
       }))
     } catch (error) {
-      console.log(error)
-      if (error.response.status === 400 || error.response.status === 422 || error.response.status === 404) {
-        const errors = error.response.data
-        console.log(errors)
-        this.setState((previousState) => ({
-          ...previousState,
-          result: 'failure',
-          error: {
-            title: errors.title,
-            'invalid-params': errors['invalid-params']
-          }
-        }))
+      if (error.response) {
+        if (error.response.status === 400 || error.response.status === 422 || error.response.status === 404) {
+          const errors = error.response.data
+          console.log(errors)
+          this.setState((previousState) => ({
+            ...previousState,
+            result: 'failure',
+            error: {
+              title: errors.title,
+              'invalid-params': errors['invalid-params']
+            }
+          }))
+        }
+        else {
+          this.setState((previousState) => ({
+            ...previousState,
+            result: 'failure',
+            error: {
+              title: 'An internal server error occurred. Please contact the administrator.',
+              'invalid-params': []
+            }
+          }))
+        }
       }
       else {
+        console.log(error)
+        console.log(error.status)
         this.setState((previousState) => ({
           ...previousState,
           result: 'failure',
@@ -204,6 +225,75 @@ class CheckIn extends Component {
       loading: false,
       open: true
     }))
+  }
+
+  updateUri = (uri) => {
+    let img = new Image()
+
+    // Create a canvas to crop image
+    const canvas = document.createElement("canvas")
+    const ctx = canvas.getContext("2d")
+
+    img.onload = async () => {
+      // Validate face
+      try {
+        await tf.setBackend('wasm')
+        // BLAZEFACE: const model = await blazeface.load()
+        // BLAZEFACE: const returnTensors = false
+        // BLAZEFACE: const predictions = await model.estimateFaces(img, returnTensors)
+        const model = await faceLandmarksDetection.load(faceLandmarksDetection.SupportedPackages.mediapipeFacemesh)
+        const predictions = await model.estimateFaces({input: img})
+        if (predictions.length > 0) {
+          // BLAZEFACE: const prediction = predictions[0]
+          const prediction = predictions[0].boundingBox
+          // Obtain source x and y from topLeft
+          let sx = prediction.topLeft[0]
+          let sy = prediction.topLeft[1]
+
+          // Calculate the width and height of the prediction
+          const sWidth = prediction.bottomRight[0] - prediction.topLeft[0]
+          const sHeight = prediction.bottomRight[1] - prediction.topLeft[1]
+          // Calculate the center of the prediction
+          const cx = sx + sWidth / 2
+          const cy = sy + sHeight / 2
+          // To capture the entire face, expand from the center.
+          // Calculate the length of the square and expand by 1.7 times.
+          // If the length is greater than sWidth or sHeight, then select the smallest
+          let l = Math.min(sHeight, sHeight) * 1.7
+          l = Math.min(l, img.width, img.height)
+
+          // Calculate new sx and sy (topRight) based on caluclated length
+          sx = cx - l / 2 > 0 ? cx - l / 2 : 0
+          sy = cy - l / 2 > 0 ? cy - l / 2 : 0
+          // Check sx + l and sx + l (bottomLeft) is smaller than img.width and img.height
+          if (sx + l > img.width) {
+            sx = img.width - l
+          }
+          if (sy + l > img.height) {
+            sy = img.height - l
+          }
+
+          // Rewrite the canvas width and height
+          canvas.width = l
+          canvas.height = l
+          ctx.drawImage(img, sx, sy, l, l, 0, 0, l, l)
+          // Export the image of the face
+          uri = canvas.toDataURL('image/jpeg')
+          this.setState((previousState) => ({
+            ...previousState,
+            isFace: true,
+            uri: uri
+          }))
+        }
+        else {
+          console.log('No faces detected')
+        }
+      } catch(err) {
+        console.log(err)
+      }
+    }
+
+    img.src = uri
   }
 
   render() {
