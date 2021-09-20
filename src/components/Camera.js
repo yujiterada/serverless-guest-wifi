@@ -9,7 +9,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { debounce } from '@material-ui/core';
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
+import CameraIcon from '@material-ui/icons/Camera';
 
 const styles = (theme) => ({
   root: {
@@ -166,7 +166,7 @@ class Camera extends Component {
           zIndex: -1,
         }}></Grid>
         <Fab color="primary" aria-label="add" className={classes.fabPhoto} onClick={() => this.handleTakePhoto()}>
-          <RadioButtonCheckedIcon fontSize="large"/>
+          <CameraIcon fontSize="large"/>
         </Fab>
         <Fab color="primary" aria-label="add" className={classes.fabBack} onClick={this.handleCloseCamera}>
           <ArrowBackIcon fontSize="large"/>
