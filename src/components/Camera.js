@@ -45,8 +45,10 @@ class Camera extends Component {
       cameraViewStyle: {}
     }
 
-    this.cameraPhoto = null
+    this.updateDimensions = this.updateDimensions.bind(this)
     this.delayedCallback = debounce(this.updateDimensions, 1000)
+
+    this.cameraPhoto = null
     this.handleCloseCamera = () => {
       this.stopCamera()
       this.props.closeCamera()
@@ -55,7 +57,6 @@ class Camera extends Component {
       this.props.updateUri(this.takePhoto())
       this.handleCloseCamera()
     }
-    this.updateDimensions = this.updateDimensions.bind(this)
     this.videoRef = React.createRef()
   }
 
