@@ -23,7 +23,7 @@
         },
         "users": {
           "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
-          "s3Key": "amplify-builds/users-6c597530703149697863-build.zip",
+          "s3Key": "amplify-builds/users-6d46776b7a3033375875-build.zip",
           "webexBaseUrl": "https://webexapis.com/v1"
         },
         "webhooks": {

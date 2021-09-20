@@ -51,7 +51,7 @@ const { User } = require('/opt/nodejs/User')
 
 // declare a new express app
 const app = express()
-app.use(express.json())
+app.use(express.json({limit:'2mb'}))
 app.use(awsServerlessExpressMiddleware.eventContext())
 
 // Enable CORS for all methods
@@ -145,7 +145,7 @@ app.post('/users',
       const accessRequestId = accessRequest.id
 
       // Send approval request with Webex card
-      const approvalCard = GuestArrivalCard(`${guest.firstName} ${guest.lastName}`, `${guest.organization}`, guest.email, accessRequestId)
+      const approvalCard = GuestArrivalCard(`${guest.firstName} ${guest.lastName}`, `${guest.organization}`, guest.email, accessRequestId, req.body.photo)
       const markdown = 'Guest has arrived.'
       await host.sendWebexCard(WEBEX_ACCESS_TOKEN, markdown, approvalCard)
 
