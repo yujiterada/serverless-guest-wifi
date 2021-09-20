@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import { connect } from 'react-redux'
 import { compose } from 'redux'
-import CameraPhoto, { FACING_MODES } from 'jslib-html5-camera-photo';
+import CameraPhoto, { FACING_MODES, IMAGE_TYPES } from 'jslib-html5-camera-photo';
 
 import Fab from '@material-ui/core/Fab';
 import Grid from '@material-ui/core/Grid';
@@ -147,7 +147,8 @@ class Camera extends Component {
 
   takePhoto () {
     const config = {
-      sizeFactor: 1
+      sizeFactor: 1,
+      imageType : IMAGE_TYPES.JPG
     }
     return this.cameraPhoto.getDataUri(config)
   }
