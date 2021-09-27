@@ -98,6 +98,7 @@ class CheckIn extends Component {
     lastName: '',
     loading: false,
     organization: '',
+    numberOfFaces: 0,
     result: '',
     uri: null,
   }
@@ -154,7 +155,7 @@ class CheckIn extends Component {
       // Create body to POST
       const data = {
         body: {
-          photo: this.state.isFace ? this.state.uri : null,
+          photo: this.state.isFace && this.state.numberOfFaces === 1 ? this.state.uri : null,
           firstName: this.state.firstName,
           guestEmail: this.state.guestEmail,
           hostEmail: this.state.hostEmail,
@@ -223,12 +224,19 @@ class CheckIn extends Component {
     this.setState((previousState) => ({
       ...previousState,
       loading: false,
-      open: true
+      isOpen: true
     }))
   }
 
   updateUri = (uri) => {
     let img = new Image()
+
+    this.setState((previousState) => ({
+      ...previousState,
+      isFace: null,
+      uri: null,
+      numberOfFaces: 0
+    }))
 
     // Create a canvas to crop image
     const canvas = document.createElement("canvas")
@@ -243,7 +251,8 @@ class CheckIn extends Component {
         // BLAZEFACE: const predictions = await model.estimateFaces(img, returnTensors)
         const model = await faceLandmarksDetection.load(faceLandmarksDetection.SupportedPackages.mediapipeFacemesh)
         const predictions = await model.estimateFaces({input: img})
-        if (predictions.length > 0) {
+        console.log(predictions)
+        if (predictions.length === 1) {
           // BLAZEFACE: const prediction = predictions[0]
           const prediction = predictions[0].boundingBox
           // Obtain source x and y from topLeft
@@ -282,11 +291,27 @@ class CheckIn extends Component {
           this.setState((previousState) => ({
             ...previousState,
             isFace: true,
+            numberOfFaces: 1,
+            uri: uri
+          }))
+        }
+        else if (predictions.length > 1) {
+          console.log('Too many faces detected')
+          this.setState((previousState) => ({
+            ...previousState,
+            isFace: true,
+            numberOfFaces: predictions.length,
             uri: uri
           }))
         }
         else {
           console.log('No faces detected')
+          this.setState((previousState) => ({
+            ...previousState,
+            isFace: false,
+            numberOfFaces: 0,
+            uri: uri
+          }))
         }
       } catch(err) {
         console.log(err)
@@ -421,6 +446,26 @@ class CheckIn extends Component {
                       paddingLeft: '14px'}}>
                       Photo
                     </Typography>
+                    { !isFace && uri && (
+                      <Typography style={{
+                        color: "rgba(255, 0, 0, 1)",
+                        textAlign: 'left',
+                        paddingTop: '18.5px',
+                        paddingLeft: '14px',
+                        fontSize: '0.75rem'}}>
+                        No face in photo. Retake if required.
+                      </Typography>
+                    )}
+                    { isFace && numberOfFaces > 1 && (
+                      <Typography style={{
+                        color: "rgba(255, 0, 0, 1)",
+                        textAlign: 'left',
+                        paddingTop: '18.5px',
+                        paddingLeft: '14px',
+                        fontSize: '0.75rem'}}>
+                        Multiple faces detected in photo. Make sure there's only you in the photo. Retake if required.
+                      </Typography>
+                    )}
                     { uri === null && (
                       <AddAPhotoOutlinedIcon className={classes.photoIcon} onClick={smartphone ? this.focusCameraInput : this.handleOpenCamera}/>
                     )}
