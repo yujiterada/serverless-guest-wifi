@@ -93,8 +93,8 @@ class CheckIn extends Component {
     guestEmail: '',
     hostEmail: '',
     isCameraView: false,
-    isErrorOpen: false,
     isFace: null,
+    isOpen: false,
     lastName: '',
     loading: false,
     organization: '',
@@ -121,7 +121,7 @@ class CheckIn extends Component {
   handleCloseError = (e) => {
     this.setState((previousState) => ({
       ...previousState,
-      open: false
+      isOpen: false
     }))
   }
 
@@ -299,7 +299,7 @@ class CheckIn extends Component {
   render() {
 
     const { classes } = this.props;
-    const { firstName, lastName, organization, guestEmail, hostEmail, loading, result, error, isErrorOpen, uri, isCameraView } = this.state
+    const { firstName, lastName, organization, guestEmail, hostEmail, loading, result, error, isOpen, uri, isCameraView, numberOfFaces, isFace } = this.state
     const invalidParams = new Map(error['invalid-params'].map(obj => [obj.param, obj.msg]))
     const smartphone = /iPad|iPhone|iPod|Android/.test(navigator.userAgent) && !window.MSStream
 
@@ -472,14 +472,14 @@ class CheckIn extends Component {
             <Copyright />
           </Box>
           { result === 'failure' && (
-            <Snackbar open={isErrorOpen} onClose={this.handleCloseError}>
+            <Snackbar open={isOpen} onClose={this.handleCloseError}>
               <Alert onClose={this.handleCloseError} severity="error">
                 { error.title }
               </Alert>
             </Snackbar>
           )}
           { result === 'success' && (
-            <Snackbar open={isErrorOpen} autoHideDuration={6000} onClose={this.handleCloseError}>
+            <Snackbar open={isOpen} autoHideDuration={6000} onClose={this.handleCloseError}>
               <Alert onClose={this.handleCloseError} severity="success">
                 Success!
               </Alert>
