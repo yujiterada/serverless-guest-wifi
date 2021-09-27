@@ -20,7 +20,7 @@
     }
   },
   "Resources": {
-    "LambdaLayerVersioneff0719b": {
+    "LambdaLayerVersione1aaa3be": {
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
         "CompatibleRuntimes": {
@@ -51,13 +51,309 @@
       "DeletionPolicy": "Delete",
       "UpdateReplacePolicy": "Retain"
     },
-    "LambdaLayerPermissionPrivateeff0719b": {
+    "LambdaLayerPermissionPrivatee1aaa3be": {
       "Type": "AWS::Lambda::LayerVersionPermission",
       "Properties": {
         "Action": "lambda:GetLayerVersion",
         "LayerVersionArn": {
-          "Ref": "LambdaLayerVersioneff0719b"
+          "Ref": "LambdaLayerVersione1aaa3be"
         },
+        "Principal": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    },
+    "LambdaLayerVersionea4b74eb": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "CompatibleRuntimes": [
+          "nodejs14.x"
+        ],
+        "Content": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersionea4b74eb-build.zip"
+        },
+        "Description": "Updated layer version 2021-09-27T05:15:50.376Z",
+        "LayerName": {
+          "Fn::Sub": [
+            "serverlessguestwifiwebex-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        }
+      },
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "LambdaLayerPermissionPrivateea4b74eb": {
+      "Type": "AWS::Lambda::LayerVersionPermission",
+      "Properties": {
+        "Action": "lambda:GetLayerVersion",
+        "LayerVersionArn": "arn:aws:lambda:us-west-2:107524997680:layer:serverlessguestwifiwebex-dev:16",
+        "Principal": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    },
+    "LambdaLayerVersion29a235f5": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "CompatibleRuntimes": [
+          "nodejs14.x"
+        ],
+        "Content": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersion29a235f5-build.zip"
+        },
+        "Description": "Updated layer version 2021-09-24T05:17:55.102Z",
+        "LayerName": {
+          "Fn::Sub": [
+            "serverlessguestwifiwebex-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        }
+      },
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "LambdaLayerPermissionPrivate29a235f5": {
+      "Type": "AWS::Lambda::LayerVersionPermission",
+      "Properties": {
+        "Action": "lambda:GetLayerVersion",
+        "LayerVersionArn": "arn:aws:lambda:us-west-2:107524997680:layer:serverlessguestwifiwebex-dev:15",
+        "Principal": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    },
+    "LambdaLayerVersion16c9f311": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "CompatibleRuntimes": [
+          "nodejs14.x"
+        ],
+        "Content": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersion16c9f311-build.zip"
+        },
+        "Description": "Updated layer version 2021-09-24T05:10:40.989Z",
+        "LayerName": {
+          "Fn::Sub": [
+            "serverlessguestwifiwebex-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        }
+      },
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "LambdaLayerPermissionPrivate16c9f311": {
+      "Type": "AWS::Lambda::LayerVersionPermission",
+      "Properties": {
+        "Action": "lambda:GetLayerVersion",
+        "LayerVersionArn": "arn:aws:lambda:us-west-2:107524997680:layer:serverlessguestwifiwebex-dev:14",
+        "Principal": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    },
+    "LambdaLayerVersion0fe5844c": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "CompatibleRuntimes": [
+          "nodejs14.x"
+        ],
+        "Content": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersion0fe5844c-build.zip"
+        },
+        "Description": "Updated layer version 2021-09-24T04:57:08.512Z",
+        "LayerName": {
+          "Fn::Sub": [
+            "serverlessguestwifiwebex-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        }
+      },
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "LambdaLayerPermissionPrivate0fe5844c": {
+      "Type": "AWS::Lambda::LayerVersionPermission",
+      "Properties": {
+        "Action": "lambda:GetLayerVersion",
+        "LayerVersionArn": "arn:aws:lambda:us-west-2:107524997680:layer:serverlessguestwifiwebex-dev:13",
+        "Principal": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    },
+    "LambdaLayerVersion8363ecf8": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "CompatibleRuntimes": [
+          "nodejs14.x"
+        ],
+        "Content": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersion8363ecf8-build.zip"
+        },
+        "Description": "Updated layer version 2021-09-24T04:42:31.545Z",
+        "LayerName": {
+          "Fn::Sub": [
+            "serverlessguestwifiwebex-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        }
+      },
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "LambdaLayerPermissionPrivate8363ecf8": {
+      "Type": "AWS::Lambda::LayerVersionPermission",
+      "Properties": {
+        "Action": "lambda:GetLayerVersion",
+        "LayerVersionArn": "arn:aws:lambda:us-west-2:107524997680:layer:serverlessguestwifiwebex-dev:12",
+        "Principal": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    },
+    "LambdaLayerVersione81a7702": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "CompatibleRuntimes": [
+          "nodejs14.x"
+        ],
+        "Content": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersione81a7702-build.zip"
+        },
+        "Description": "Updated layer version 2021-09-24T03:55:53.735Z",
+        "LayerName": {
+          "Fn::Sub": [
+            "serverlessguestwifiwebex-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        }
+      },
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "LambdaLayerPermissionPrivatee81a7702": {
+      "Type": "AWS::Lambda::LayerVersionPermission",
+      "Properties": {
+        "Action": "lambda:GetLayerVersion",
+        "LayerVersionArn": "arn:aws:lambda:us-west-2:107524997680:layer:serverlessguestwifiwebex-dev:11",
+        "Principal": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    },
+    "LambdaLayerVersionb1d79dee": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "CompatibleRuntimes": [
+          "nodejs14.x"
+        ],
+        "Content": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersionb1d79dee-build.zip"
+        },
+        "Description": "Updated layer version 2021-09-24T03:47:42.498Z",
+        "LayerName": {
+          "Fn::Sub": [
+            "serverlessguestwifiwebex-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        }
+      },
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "LambdaLayerPermissionPrivateb1d79dee": {
+      "Type": "AWS::Lambda::LayerVersionPermission",
+      "Properties": {
+        "Action": "lambda:GetLayerVersion",
+        "LayerVersionArn": "arn:aws:lambda:us-west-2:107524997680:layer:serverlessguestwifiwebex-dev:10",
+        "Principal": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    },
+    "LambdaLayerVersioneff0719b": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "CompatibleRuntimes": [
+          "nodejs14.x"
+        ],
+        "Content": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersioneff0719b-build.zip"
+        },
+        "Description": "Updated layer version 2021-08-09T08:27:33.764Z",
+        "LayerName": {
+          "Fn::Sub": [
+            "serverlessguestwifiwebex-${env}",
+            {
+              "env": {
+                "Ref": "env"
+              }
+            }
+          ]
+        }
+      },
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "LambdaLayerPermissionPrivateeff0719b": {
+      "Type": "AWS::Lambda::LayerVersionPermission",
+      "Properties": {
+        "Action": "lambda:GetLayerVersion",
+        "LayerVersionArn": "arn:aws:lambda:us-west-2:107524997680:layer:serverlessguestwifiwebex-dev:9",
         "Principal": {
           "Ref": "AWS::AccountId"
         }
@@ -363,7 +659,7 @@
   "Outputs": {
     "Arn": {
       "Value": {
-        "Ref": "LambdaLayerVersioneff0719b"
+        "Ref": "LambdaLayerVersione1aaa3be"
       }
     }
   }

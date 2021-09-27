@@ -1,4 +1,4 @@
-function GuestArrivalCard(fullName, organization, email, accessRequestId, imageUrl="https://developer.webex.com/images/webex-teams-logo.png") {
+function GuestArrivalCard(fullName, organization, email, accessRequestId, imageUrl) {
   return {
     "contentType": "application/vnd.microsoft.card.adaptive",
     "content": {
@@ -13,7 +13,7 @@ function GuestArrivalCard(fullName, organization, email, accessRequestId, imageU
                 {
                   "type": "Image",
                   "style": "Person",
-                  "url": imageUrl,
+                  "url": imageUrl ? imageUrl : "https://picsum.photos/200",
                   "size": "Medium",
                   "height": "50px"
                 }

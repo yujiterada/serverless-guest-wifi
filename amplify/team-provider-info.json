@@ -39,7 +39,7 @@
         },
         "serverlessguestwifiwebex": {
           "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
-          "s3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersioneff0719b-build.zip"
+          "s3Key": "amplify-builds/serverlessguestwifiwebex-LambdaLayerVersione1aaa3be-build.zip"
         },
         "serverlessguestwifierror": {
           "deploymentBucketName": "amplify-serverlessguestwifi-dev-111518-deployment",
