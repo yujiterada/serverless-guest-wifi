@@ -1,10 +1,13 @@
-import React, { Component }  from 'react';
+import React, { Component, Fragment }  from 'react';
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 import CameraPhoto, { FACING_MODES, IMAGE_TYPES } from 'jslib-html5-camera-photo';
 
+import AppBar from '@material-ui/core/AppBar'
 import Fab from '@material-ui/core/Fab';
 import Grid from '@material-ui/core/Grid';
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
 import { withStyles } from '@material-ui/core/styles';
 import { debounce } from '@material-ui/core';
 
@@ -24,7 +27,6 @@ const styles = (theme) => ({
     bottom: theme.spacing(4)
   },
   fabBack: {
-    position: 'absolute',
     backgroundColor: "transparent",
     boxShadow: "none",
     "&:hover": {
@@ -171,22 +173,31 @@ class Camera extends Component {
     const { marginLeft, marginTop, maxHeight, maxWidth } = this.state.cameraViewStyle
 
     return (
-      <Grid container component="main" className={classes.root}>
-        <Grid item xs={12} component="video" ref={this.videoRef} autoPlay playsInline style={{
-          marginLeft: marginLeft,
-          marginTop: marginTop,
-          maxHeight: maxHeight,
-          maxWidth: maxWidth,
-          zIndex: -1,
-          objectFit: 'cover'
-        }}></Grid>
-        <Fab color="primary" aria-label="add" className={classes.fabPhoto} onClick={() => this.handleTakePhoto()}>
-          <CameraIcon fontSize="large"/>
-        </Fab>
-        <Fab color="primary" aria-label="add" className={classes.fabBack} onClick={this.handleCloseCamera}>
-          <ArrowBackIcon fontSize="large"/>
-        </Fab>
-      </Grid>
+      <Fragment>
+        <AppBar position="absolute" style={{}}>
+          <Toolbar variant="dense">
+            <Fab color="primary" aria-label="add" className={classes.fabBack} onClick={this.handleCloseCamera}>
+              <ArrowBackIcon />
+            </Fab>
+            <Typography variant="h6" color="inherit" noWrap>
+              Take A Picture
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Grid container component="main" className={classes.root}>
+          <Grid item xs={12} component="video" ref={this.videoRef} autoPlay playsInline style={{
+            marginLeft: marginLeft,
+            marginTop: marginTop,
+            maxHeight: maxHeight,
+            maxWidth: maxWidth,
+            zIndex: -1,
+            objectFit: 'cover'
+          }}></Grid>
+          <Fab color="primary" aria-label="add" className={classes.fabPhoto} onClick={() => this.handleTakePhoto()}>
+            <CameraIcon fontSize="large"/>
+          </Fab>
+        </Grid>
+      </Fragment>
     );
   }
 }
